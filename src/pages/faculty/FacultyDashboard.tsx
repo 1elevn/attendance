@@ -12,7 +12,7 @@ import { SessionStatusBadge } from '../../components/ui/Badge'
 import { getMyCourses, getCourseSessions } from '../../lib/api'
 import type { CourseWithSession } from '../../lib/api'
 import type { Session, AttendanceRecord } from '../../types'
-import { sortSessionsMostRecentFirst } from '../../lib/sessionUtils'
+import { sortSessionsMostRecentFirst, sessionAttendanceRate, sessionPresentCount } from '../../lib/sessionUtils'
 import { formatDate } from '../../lib/utils'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
@@ -70,7 +70,7 @@ export default function FacultyDashboard() {
 
   const avgAttendance = closedSessions.length > 0
     ? Math.round(
-        closedSessions.reduce((sum, s) => sum + (s.submissionsCount / s.totalStudents) * 100, 0) /
+        closedSessions.reduce((sum, s) => sum + sessionAttendanceRate(s), 0) /
         closedSessions.length
       )
     : 0
@@ -206,7 +206,8 @@ export default function FacultyDashboard() {
               <div className="flex flex-col gap-2">
                 {recentSessions.map(session => {
                   const course = myCourses.find(c => c.id === session.courseId)
-                  const rate = Math.round((session.submissionsCount / session.totalStudents) * 100)
+                  const rate = sessionAttendanceRate(session)
+                  const present = sessionPresentCount(session)
                   const records = attendanceMap[session.id] ?? []
                   const excused = records.filter(r => r.status === 'absent_excused').length
                   const unexcused = records.filter(r => r.status === 'absent_unexcused').length
@@ -227,10 +228,12 @@ export default function FacultyDashboard() {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-ink-muted">{course?.code} · {formatDate(session.date)}</p>
+                          <p className="text-xs text-ink-muted">
+                            {course?.code} · {course?.cohort} · {formatDate(session.date)}
+                          </p>
                           <p className="text-sm font-semibold text-ink-primary mt-0.5">{course?.name}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-success">{session.submissionsCount} recorded</span>
+                            <span className="text-xs text-success">{present} present</span>
                             {unexcused > 0 && <span className="text-xs text-danger">{unexcused} unexcused</span>}
                             {excused > 0 && <span className="text-xs text-warning">{excused} excused</span>}
                           </div>
