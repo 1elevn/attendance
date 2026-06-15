@@ -21,3 +21,16 @@ export function groupSessionsByStatus(sessions: Session[]) {
     closed: sortSessionsMostRecentFirst(sessions.filter((s) => s.status === 'closed')),
   }
 }
+
+/** Students marked present — includes faculty overrides for closed sessions. */
+export function sessionPresentCount(session: Session): number {
+  if (session.status === 'closed' && session.presentCount !== undefined) {
+    return session.presentCount
+  }
+  return session.submissionsCount
+}
+
+export function sessionAttendanceRate(session: Session): number {
+  if (session.totalStudents <= 0) return 0
+  return Math.round((sessionPresentCount(session) / session.totalStudents) * 100)
+}

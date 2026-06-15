@@ -29,6 +29,7 @@ export interface Session {
   windowCloseTime: string
   status: 'upcoming' | 'open' | 'processing' | 'closed'
   submissionsCount: number
+  presentCount?: number
   totalStudents: number
   minSamples: number
   epsilon: number

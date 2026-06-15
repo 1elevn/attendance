@@ -9,7 +9,7 @@ import { SessionRowSkeleton } from '../../components/ui/Skeleton'
 import { getMyCourses, getCourseSessions, deleteSession, ApiError } from '../../lib/api'
 import type { CourseWithSession } from '../../lib/api'
 import type { Session } from '../../types'
-import { groupSessionsByStatus } from '../../lib/sessionUtils'
+import { groupSessionsByStatus, sessionAttendanceRate, sessionPresentCount } from '../../lib/sessionUtils'
 import { formatDate, cn } from '../../lib/utils'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import CreateSessionModal from './CreateSessionModal'
@@ -260,9 +260,8 @@ function SessionRow({
   onEdit?: () => void
   onCancel?: () => void
 }) {
-  const rate = session.totalStudents > 0
-    ? Math.round((session.submissionsCount / session.totalStudents) * 100)
-    : 0
+  const rate = sessionAttendanceRate(session)
+  const present = sessionPresentCount(session)
 
   const isClickable = !!onClick
 
@@ -294,7 +293,7 @@ function SessionRow({
           )}>
             {rate}%
           </p>
-          <p className="text-xs text-ink-muted">{session.submissionsCount}/{session.totalStudents}</p>
+          <p className="text-xs text-ink-muted">{present}/{session.totalStudents}</p>
         </div>
       )}
 
