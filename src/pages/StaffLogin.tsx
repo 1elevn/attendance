@@ -144,7 +144,7 @@ export default function StaffLogin() {
               <Input
                 label="Email"
                 type="email"
-                placeholder={DEMO_CREDS[selectedRole].email}
+                placeholder={import.meta.env.PROD ? 'you@ashesi.edu.gh' : DEMO_CREDS[selectedRole].email}
                 value={identifier}
                 onChange={e => setIdentifier(e.target.value)}
                 autoFocus
@@ -157,11 +157,13 @@ export default function StaffLogin() {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSignIn()}
               />
-              <p className="text-xs text-ink-muted -mt-1">
-                Demo: <code className="text-accent font-mono">{DEMO_CREDS[selectedRole]?.email}</code>
-                {' · '}
-                <code className="text-accent font-mono">password123</code>
-              </p>
+              {!import.meta.env.PROD && (
+                <p className="text-xs text-ink-muted -mt-1">
+                  Demo: <code className="text-accent font-mono">{DEMO_CREDS[selectedRole]?.email}</code>
+                  {' · '}
+                  <code className="text-accent font-mono">password123</code>
+                </p>
+              )}
               <Button fullWidth size="lg" onClick={handleSignIn} loading={loading}>
                 Sign In
                 <ArrowRight size={15} />
