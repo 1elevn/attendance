@@ -27,6 +27,8 @@ Setting it too HIGH: Legitimate students who are physically present may not form
 
 The recommended value is 10. Only change this if you have a specific reason — for example, a very small class. Consult your department if unsure.`
 
+const EARLY_OPEN_MINUTES = 5
+
 function addMinutes(time: string, mins: number): string {
   const [h, m] = time.split(':').map(Number)
   const total = h * 60 + m + mins
@@ -43,9 +45,9 @@ function defaultStartTime(schedule: string): string {
 }
 
 function windowDurationFromSession(session: Session): number {
-  const [oh, om] = session.windowOpenTime.split(':').map(Number)
+  const [sh, sm] = session.startTime.split(':').map(Number)
   const [ch, cm] = session.windowCloseTime.split(':').map(Number)
-  return (ch * 60 + cm) - (oh * 60 + om)
+  return (ch * 60 + cm) - (sh * 60 + sm)
 }
 
 export default function CreateSessionModal({
@@ -90,6 +92,7 @@ export default function CreateSessionModal({
     // not when parent polling refreshes course/session object references.
   }, [open, session?.id])
 
+  const windowOpen = addMinutes(classStartTime, -EARLY_OPEN_MINUTES)
   const windowClose = addMinutes(classStartTime, parseInt(windowDuration) || 5)
 
   const handleMinSamplesChange = (val: string) => {
@@ -185,7 +188,7 @@ export default function CreateSessionModal({
               type="time"
               value={classStartTime}
               onChange={e => setClassStartTime(e.target.value)}
-              hint={selectedCourse ? `Schedule: ${selectedCourse.schedule.split('·')[1]?.trim() || ''}` : undefined}
+              // hint={selectedCourse ? `Schedule: ${selectedCourse.schedule.split('·')[1]?.trim() || ''}` : undefined}
             />
           </div>
 
@@ -203,7 +206,7 @@ export default function CreateSessionModal({
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-accent/5 border border-accent/15">
             <Clock size={14} className="text-accent flex-shrink-0" />
             <p className="text-xs text-accent">
-              Window opens at <strong>{classStartTime}</strong> and closes at <strong>{windowClose}</strong>
+              Window opens at <strong>{windowOpen}</strong> ({EARLY_OPEN_MINUTES} min before class) and closes at <strong>{windowClose}</strong>
             </p>
           </div>
 
