@@ -48,6 +48,8 @@ export interface AttendanceRecord {
   overriddenBy?: string
   lat?: number
   lng?: number
+  /** Laptops locate over WiFi and land further from the room than phones do. */
+  deviceType?: 'laptop' | 'mobile'
 }
 
 export interface Student {

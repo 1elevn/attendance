@@ -155,6 +155,7 @@ export async function submitAttendance(body: {
   lat: number
   lng: number
   deviceFingerprint?: string
+  deviceType?: 'laptop' | 'mobile'
 }) {
   return apiFetch<{ status: string; courseName: string; courseCode: string }>(
     '/attendance/submit',

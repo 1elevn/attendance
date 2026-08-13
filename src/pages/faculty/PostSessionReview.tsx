@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { UserCheck, UserX, MessageSquare, AlertTriangle, Search, Clock, ArrowLeft, X } from 'lucide-react'
+import { UserCheck, UserX, MessageSquare, AlertTriangle, Search, Clock, ArrowLeft, X, Laptop } from 'lucide-react'
 import { Card, Divider } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { StatusBadge, Badge } from '../../components/ui/Badge'
@@ -238,6 +238,15 @@ export default function PostSessionReview() {
                         <span className="flex items-center gap-1 text-xs text-ink-muted">
                           <Clock size={11} />
                           {new Date(record.submittedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
+                      )}
+                      {record.deviceType === 'laptop' && (
+                        <span
+                          title="Checked in on a laptop — WiFi location is less precise than a phone's, so treat a borderline absence with care"
+                          className="flex items-center gap-1 text-xs text-warning"
+                        >
+                          <Laptop size={11} />
+                          Laptop
                         </span>
                       )}
                     </div>
