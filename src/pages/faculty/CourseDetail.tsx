@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ChevronRight, XCircle, Clock, ArrowLeft, Pencil } from 'lucide-react'
+import { Plus, ChevronRight, XCircle, Clock, ArrowLeft, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { SessionStatusBadge } from '../../components/ui/Badge'
 import { ConfirmModal } from '../../components/ui/Modal'
@@ -60,12 +60,13 @@ export default function CourseDetail() {
 
   const handleCancel = async () => {
     if (!cancelTarget) return
+    const wasClosed = cancelTarget.status === 'closed'
     try {
       await deleteSession(cancelTarget.id)
       setSessions(prev => prev.filter(s => s.id !== cancelTarget.id))
-      toast.success('Session cancelled')
+      toast.success(wasClosed ? 'Session deleted' : 'Session cancelled')
     } catch {
-      toast.error('Failed to cancel session')
+      toast.error(wasClosed ? 'Failed to delete session' : 'Failed to cancel session')
     } finally {
       setCancelTarget(null)
     }
@@ -168,6 +169,7 @@ export default function CourseDetail() {
                   `/faculty/sessions/${session.id}/review`,
                   { state: { session, course } },
                 )}
+                onCancel={() => setCancelTarget(session)}
               />
             ))}
           </Section>
@@ -223,14 +225,23 @@ export default function CourseDetail() {
         open={!!cancelTarget}
         onClose={() => setCancelTarget(null)}
         onConfirm={handleCancel}
-        title="Cancel this session?"
+        title={cancelTarget?.status === 'closed' ? 'Delete this session?' : 'Cancel this session?'}
         message={
-          <p>
-            The session for <strong>{formatDate(cancelTarget?.date || '')}</strong> will be cancelled and removed.
-            Students will not be able to submit attendance.
-          </p>
+          cancelTarget?.status === 'closed' ? (
+            <p>
+              The session for <strong>{formatDate(cancelTarget?.date || '')}</strong> and the
+              attendance already recorded for it will be deleted permanently. Every student in
+              this session loses their record for it, present and absent alike, and this cannot
+              be undone. Create a new session afterwards to run it again.
+            </p>
+          ) : (
+            <p>
+              The session for <strong>{formatDate(cancelTarget?.date || '')}</strong> will be cancelled and removed.
+              Students will not be able to submit attendance.
+            </p>
+          )
         }
-        confirmLabel="Yes, cancel session"
+        confirmLabel={cancelTarget?.status === 'closed' ? 'Yes, delete it' : 'Yes, cancel session'}
         cancelLabel="Keep it"
         danger
       />
@@ -297,7 +308,7 @@ function SessionRow({
         </div>
       )}
 
-      {session.status === 'upcoming' && (onEdit || onCancel) && (
+      {(session.status === 'upcoming' || session.status === 'open') && (onEdit || onCancel) && (
         <div className="flex items-center gap-1 flex-shrink-0">
           {onEdit && (
             <button
@@ -318,6 +329,17 @@ function SessionRow({
             </button>
           )}
         </div>
+      )}
+
+      {session.status === 'closed' && onCancel && (
+        <button
+          onClick={e => { e.stopPropagation(); onCancel() }}
+          title="Delete this session and run it again"
+          className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-2 py-1 rounded-lg hover:bg-danger/10 flex-shrink-0"
+        >
+          <Trash2 size={14} />
+          Delete
+        </button>
       )}
 
       {isClickable && (
