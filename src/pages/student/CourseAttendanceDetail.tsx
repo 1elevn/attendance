@@ -46,8 +46,12 @@ export default function CourseAttendanceDetail() {
     return () => { cancelled = true }
   }, [studentId, courseId])
 
+  // The endpoint returns late sessions alongside absences so the student can see
+  // the timestamp. A late arrival is not an absence and must not be counted as one.
   const unexcused = absences.filter(a => a.status === 'absent_unexcused').length
   const excused = absences.filter(a => a.status === 'absent_excused').length
+  const late = absences.filter(a => a.status === 'late').length
+  const absenceCount = unexcused + excused
 
   return (
     <div className="min-h-screen p-5 dot-grid">
@@ -88,17 +92,18 @@ export default function CourseAttendanceDetail() {
               <div className="flex gap-3 mt-2">
                 {unexcused > 0 && <span className="text-xs text-danger font-medium">{unexcused} unexcused</span>}
                 {excused > 0 && <span className="text-xs text-warning font-medium">{excused} excused</span>}
+                {late > 0 && <span className="text-xs text-warning font-medium">{late} late</span>}
               </div>
             </div>
             <div className="text-right flex-shrink-0">
               <p className={cn(
                 'text-3xl font-black',
-                unexcused > 0 ? 'text-danger' : 'text-warning'
+                unexcused > 0 ? 'text-danger' : absenceCount > 0 ? 'text-warning' : 'text-success'
               )}>
-                {absences.length}
+                {absenceCount}
               </p>
               <p className="text-xs text-ink-muted">
-                absence{absences.length !== 1 ? 's' : ''}
+                absence{absenceCount !== 1 ? 's' : ''}
               </p>
             </div>
           </motion.div>
@@ -170,7 +175,9 @@ export default function CourseAttendanceDetail() {
           ))}
 
           {!loading && absences.length === 0 && student && (
-            <p className="text-sm text-ink-muted text-center py-10">No absences for this course.</p>
+            <p className="text-sm text-ink-muted text-center py-10">
+              No absences or late arrivals for this course.
+            </p>
           )}
         </div>
       </div>

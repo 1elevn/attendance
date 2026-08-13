@@ -58,7 +58,7 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
       <span
         className={cn('h-1.5 w-1.5 rounded-full flex-shrink-0', {
           'bg-success': status === 'recorded',
-          'bg-warning': status === 'absent_excused',
+          'bg-warning': status === 'late' || status === 'absent_excused',
           'bg-danger': status === 'absent_unexcused',
           'bg-ink-muted': status === 'pending',
         })}

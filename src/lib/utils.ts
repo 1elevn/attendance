@@ -35,6 +35,7 @@ export function formatNextSessionDate(dateStr: string) {
 export function statusLabel(status: AttendanceStatus) {
   const map: Record<AttendanceStatus, string> = {
     recorded: 'Recorded',
+    late: 'Late',
     absent_excused: 'Absent · Excused',
     absent_unexcused: 'Absent · Unexcused',
     pending: 'Pending',
@@ -45,6 +46,7 @@ export function statusLabel(status: AttendanceStatus) {
 export function statusColors(status: AttendanceStatus) {
   const map: Record<AttendanceStatus, string> = {
     recorded: 'text-success bg-success/10 border-success/20',
+    late: 'text-warning bg-warning/10 border-warning/20',
     absent_excused: 'text-warning bg-warning/10 border-warning/20',
     absent_unexcused: 'text-danger bg-danger/10 border-danger/20',
     pending: 'text-ink-secondary bg-ink-primary/5 border-ink-primary/10',
@@ -56,7 +58,7 @@ export function absenceReasonLabel(reason: AbsenceReason): string {
   const map: Record<AbsenceReason, string> = {
     location_undetected: 'Location undetected',
     did_not_check_in: 'Did not check in',
-    checked_in_late: 'Checked in late',
+    checked_in_late: 'Too late to count',
   }
   return map[reason]
 }
