@@ -11,7 +11,7 @@ import { Input } from '../../components/ui/Input'
 import { getSession, getSessionAttendance, updateAttendanceRecord, ApiError } from '../../lib/api'
 import type { CourseWithSession } from '../../lib/api'
 import type { AttendanceRecord, AttendanceStatus } from '../../types'
-import { formatDate, cn } from '../../lib/utils'
+import { formatDate, cn, absenceReasonLabel } from '../../lib/utils'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import toast from 'react-hot-toast'
 
@@ -241,6 +241,11 @@ export default function PostSessionReview() {
                         </span>
                       )}
                     </div>
+                    {record.absenceReason && (
+                      <p className="text-xs text-ink-secondary mt-0.5">
+                        {absenceReasonLabel(record.absenceReason)}
+                      </p>
+                    )}
                     {record.note && (
                       <p className="text-xs text-ink-secondary mt-0.5 italic">"{record.note}"</p>
                     )}

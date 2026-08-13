@@ -2,7 +2,11 @@ export type Role = 'student' | 'faculty' | 'admin'
 
 export type AttendanceStatus = 'recorded' | 'absent_excused' | 'absent_unexcused' | 'pending'
 
-export type AbsenceReason = 'location_undetected' | 'did_not_check_in'
+export type AbsenceReason =
+  | 'location_undetected'
+  | 'did_not_check_in'
+  /** Student checked in, but only after the attendance window had closed. */
+  | 'checked_in_late'
 
 export interface Course {
   id: string

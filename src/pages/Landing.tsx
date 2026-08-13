@@ -51,7 +51,7 @@ function getGreeting() {
 }
 
 type Stage = 'form' | 'locating' | 'location_blocked' | 'success' | 'error'
-type ErrorCode = 'window_closed' | 'window_not_open' | 'duplicate_device' | 'invalid_pin'
+type ErrorCode = 'window_not_open' | 'duplicate_device' | 'invalid_pin'
 
 const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: boolean }> = {
   invalid_pin: {
@@ -61,10 +61,6 @@ const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: bo
   window_not_open: {
     title: "Too early!",
     body: "Your lecturer hasn't opened the attendance window yet. Hold tight — they'll let you know when to submit.",
-  },
-  window_closed: {
-    title: "Window has closed",
-    body: "Attendance for this session has already closed. If you were in class, speak to your lecturer.",
   },
   duplicate_device: {
     title: "Device already used",
@@ -158,7 +154,12 @@ export default function Landing() {
         deviceFingerprint,
       })
       setSessionInfo({ courseName: result.courseName, courseCode: result.courseCode })
-      setRecordedAt(new Date())
+      setRecordedAt(new Date(result.recordedAt))
+      // A late check-in gets the same confirmation as an on-time one. The
+      // student's job is done the moment they tap; nothing they can do at this
+      // point changes the outcome, so there is nothing to alarm them with. The
+      // timestamp and the late flag go to the instructor's review screen, and
+      // show up in the student's own absence history afterwards.
       setStage('success')
       toast.success('Attendance recorded')
     } catch (err) {
@@ -168,8 +169,6 @@ export default function Landing() {
           setError('invalid_pin')
         } else if (errCode === 'window_not_open') {
           setError('window_not_open')
-        } else if (errCode === 'window_closed') {
-          setError('window_closed')
         } else if (errCode === 'duplicate_device') {
           setError('duplicate_device')
         } else if (errCode === 'duplicate_submission') {
