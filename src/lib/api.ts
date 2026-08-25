@@ -307,6 +307,60 @@ export async function getAdminCourses() {
   return apiFetch<Course[]>('/admin/courses')
 }
 
+export async function updateAdminCourse(
+  courseId: string,
+  body: Partial<{
+    code: string
+    name: string
+    department: string
+    credits: number
+    schedule: string
+    room: string
+    facultyId: string
+    cohort: string
+    cohortCode: string
+    enrolledCount: number
+  }>,
+) {
+  return apiFetch<Course>(`/admin/courses/${courseId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  })
+}
+
+export interface AdminFaculty {
+  id: string
+  name: string
+  email: string
+  department: string
+}
+
+export async function getAdminFaculty() {
+  return apiFetch<AdminFaculty[]>('/admin/faculty')
+}
+
+// ─── Camu sync ────────────────────────────────────────────────────────────────
+
+export interface CamuSyncResult {
+  id: string
+  startedAt: string
+  finishedAt: string | null
+  status: 'running' | 'success' | 'error'
+  studentsCreated: number
+  studentsUpdated: number
+  coursesCreated: number
+  enrollmentsLinked: number
+  errors: string[]
+}
+
+export async function triggerCamuSync() {
+  return apiFetch<CamuSyncResult>('/admin/camu/sync', { method: 'POST' })
+}
+
+export async function getCamuSyncStatus() {
+  return apiFetch<CamuSyncResult | null>('/admin/camu/sync/status')
+}
+
 export interface AdminStudent {
   id: string
   studentId: string
@@ -314,7 +368,7 @@ export interface AdminStudent {
   email: string
   program: string
   year: number
-  cohortCode: string
+  cohortCode?: string
   courseIds: string[]
 }
 

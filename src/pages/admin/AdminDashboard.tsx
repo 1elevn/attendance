@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff, RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { getWeeklyAbsences, getAdminCourses, getAdminStudents, ApiError } from '../../lib/api'
+import toast from 'react-hot-toast'
+import { getWeeklyAbsences, getAdminCourses, getAdminStudents, triggerCamuSync, ApiError } from '../../lib/api'
 import type { AdminStudent } from '../../lib/api'
 import type { Course } from '../../types'
 import {
@@ -48,13 +49,14 @@ export default function AdminDashboard() {
   })
   const [pinnedStudentIds, setPinnedStudentIds] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
 
   const [summaries, setSummaries] = useState<WeeklyAbsenceSummary[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [students, setStudents] = useState<AdminStudent[]>([])
 
-  // Load static data (courses + students) once
-  useEffect(() => {
+  // Load static data (courses + students)
+  const loadStaticData = useCallback(() => {
     Promise.all([
       getAdminCourses(),
       getAdminStudents({ limit: 1000 }),
@@ -63,6 +65,32 @@ export default function AdminDashboard() {
       setStudents(s.data)
     }).catch(() => {})
   }, [])
+
+  useEffect(loadStaticData, [loadStaticData])
+
+  async function handleCamuSync() {
+    setIsSyncing(true)
+    try {
+      const result = await triggerCamuSync()
+      if (result.status === 'error') {
+        toast.error(
+          `Sync completed with ${result.errors.length} error${result.errors.length !== 1 ? 's' : ''}. ` +
+          `${result.studentsCreated + result.studentsUpdated} students, ${result.coursesCreated} new courses.`,
+        )
+      } else {
+        toast.success(
+          `Synced ${result.studentsCreated} new / ${result.studentsUpdated} updated students, ` +
+          `${result.coursesCreated} new courses, ${result.enrollmentsLinked} enrollments linked.`,
+        )
+      }
+      loadStaticData()
+      loadAbsences()
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Camu sync failed')
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   // Load weekly absences whenever week/course changes
   const loadAbsences = useCallback(() => {
@@ -289,9 +317,20 @@ export default function AdminDashboard() {
             </button>
           </div>
 
+          {/* Camu sync */}
+          <button
+            onClick={handleCamuSync}
+            disabled={isSyncing}
+            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            title="Pull students and enrollments from Camu"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing…' : 'Sync from Camu'}
+          </button>
+
           {/* Summary pills */}
           {!isLoading && filteredSummaries.length > 0 && (
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-2">
               {flaggedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-50 text-red-600 border border-red-200 px-2.5 py-1 rounded-full">
                   <Flag className="w-3 h-3 fill-red-500" />

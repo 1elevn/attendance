@@ -12,11 +12,13 @@ export interface Course {
   credits: number
   schedule: string
   room: string
-  facultyId: string
+  facultyId: string | null
   facultyName: string
   cohort: string
   cohortCode: string   // e.g. "CS201_A" — students use this to check in
   enrolledCount: number
+  source: 'manual' | 'camu'
+  needsSetup: boolean
 }
 
 export interface Session {

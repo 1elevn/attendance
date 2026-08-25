@@ -9,8 +9,9 @@ interface FacultyLayoutProps {
 }
 
 export function FacultyLayout({ children }: FacultyLayoutProps) {
-  const { userName, logout } = useAppStore()
+  const { userName, role, logout } = useAppStore()
   const navigate = useNavigate()
+  const isAdmin = role === 'admin'
 
   const handleLogout = () => {
     logout()
@@ -28,7 +29,7 @@ export function FacultyLayout({ children }: FacultyLayoutProps) {
           <span className="text-sm font-semibold text-ink-primary">Ashesi Attendance</span>
           <nav className="hidden sm:flex items-center gap-1">
             <NavLink
-              to="/faculty/dashboard"
+              to={isAdmin ? '/admin/dashboard' : '/faculty/dashboard'}
               className={({ isActive }) =>
                 `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
                   isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated'
@@ -38,7 +39,7 @@ export function FacultyLayout({ children }: FacultyLayoutProps) {
               Dashboard
             </NavLink>
             <NavLink
-              to="/faculty/courses"
+              to={isAdmin ? '/admin/courses' : '/faculty/courses'}
               className={({ isActive }) =>
                 `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
                   isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated'
