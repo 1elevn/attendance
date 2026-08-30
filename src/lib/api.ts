@@ -345,12 +345,25 @@ export interface CamuSyncResult {
   id: string
   startedAt: string
   finishedAt: string | null
-  status: 'running' | 'success' | 'error'
+  durationMs: number | null
+  status: 'running' | 'success' | 'partial' | 'error'
+  trigger: 'manual' | 'scheduled' | 'cli'
+  triggeredBy: string | null
+  triggeredByName: string | null
+  academicYear: string | null
+  semester: string | null
+  rosterPagesFetched: number
+  rosterRowsFetched: number
+  enrolmentRowsFetched: number
   studentsCreated: number
   studentsUpdated: number
+  studentsDeactivated: number
   coursesCreated: number
   enrollmentsLinked: number
+  enrollmentsUnlinked: number
+  errorCount: number
   errors: string[]
+  warnings: string[]
 }
 
 export async function triggerCamuSync() {
@@ -359,6 +372,16 @@ export async function triggerCamuSync() {
 
 export async function getCamuSyncStatus() {
   return apiFetch<CamuSyncResult | null>('/admin/camu/sync/status')
+}
+
+export async function getCamuSyncHistory(opts?: { page?: number; limit?: number }) {
+  const params = new URLSearchParams({
+    page: String(opts?.page ?? 1),
+    limit: String(opts?.limit ?? 20),
+  })
+  return apiFetch<{ data: CamuSyncResult[]; total: number; page: number; limit: number; pages: number }>(
+    `/admin/camu/sync/history?${params}`,
+  )
 }
 
 export interface AdminStudent {
@@ -370,6 +393,8 @@ export interface AdminStudent {
   year: number
   cohortCode?: string
   courseIds: string[]
+  courseCount: number
+  source: 'manual' | 'camu'
 }
 
 export async function getAdminStudents(opts?: { limit?: number; page?: number; q?: string }) {
@@ -381,6 +406,25 @@ export async function getAdminStudents(opts?: { limit?: number; page?: number; q
   return apiFetch<{ data: AdminStudent[]; total: number; page: number; limit: number; pages: number }>(
     `/admin/students?${params}`,
   )
+}
+
+/**
+ * Pages through every admin student, capped at 20 pages (2000 students) —
+ * /admin/students clamps limit to 100 server-side, so a naive limit:1000
+ * request silently truncates. Use only where the full set is genuinely
+ * needed (e.g. building filter option lists); prefer getAdminStudents with
+ * pagination for anything rendered as a list.
+ */
+export async function fetchAllAdminStudents(): Promise<AdminStudent[]> {
+  const all: AdminStudent[] = []
+  let page = 1
+  for (;;) {
+    const res = await getAdminStudents({ limit: 100, page })
+    all.push(...res.data)
+    if (page >= res.pages || page >= 20) break
+    page++
+  }
+  return all
 }
 
 export function getExportUrl(week: string, format: 'csv' | 'json', courseId?: string) {

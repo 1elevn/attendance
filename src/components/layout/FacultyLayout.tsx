@@ -48,6 +48,30 @@ export function FacultyLayout({ children }: FacultyLayoutProps) {
             >
               Courses
             </NavLink>
+            {isAdmin && (
+              <>
+                <NavLink
+                  to="/admin/students"
+                  className={({ isActive }) =>
+                    `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
+                      isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated'
+                    }`
+                  }
+                >
+                  Students
+                </NavLink>
+                <NavLink
+                  to="/admin/camu"
+                  className={({ isActive }) =>
+                    `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
+                      isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated'
+                    }`
+                  }
+                >
+                  Camu Sync
+                </NavLink>
+              </>
+            )}
           </nav>
         </div>
 

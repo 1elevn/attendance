@@ -19,6 +19,8 @@ import FacultyDashboard from './pages/faculty/FacultyDashboard'
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminCourses from './pages/admin/AdminCourses'
+import AdminStudents from './pages/admin/AdminStudents'
+import AdminCamu from './pages/admin/AdminCamu'
 
 function FacultyProtected({ children }: { children: React.ReactNode }) {
   const { role } = useAppStore()
@@ -62,6 +64,8 @@ export default function App() {
         {/* Admin */}
         <Route path="/admin/dashboard" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
         <Route path="/admin/courses" element={<AdminProtected><AdminCourses /></AdminProtected>} />
+        <Route path="/admin/students" element={<AdminProtected><AdminStudents /></AdminProtected>} />
+        <Route path="/admin/camu" element={<AdminProtected><AdminCamu /></AdminProtected>} />
         <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
