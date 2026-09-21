@@ -147,6 +147,7 @@ export default function AdminCamu() {
                 <Stat label="Students updated" value={status.studentsUpdated} />
                 <Stat label="Students deactivated" value={status.studentsDeactivated} />
                 <Stat label="Courses created" value={status.coursesCreated} />
+                <Stat label="Faculty accounts created" value={status.facultyAccountsCreated} />
                 <Stat label="Enrolments linked" value={status.enrollmentsLinked} />
                 <Stat label="Enrolments unlinked" value={status.enrollmentsUnlinked} />
               </div>

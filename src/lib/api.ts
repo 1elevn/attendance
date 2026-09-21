@@ -359,6 +359,7 @@ export interface CamuSyncResult {
   studentsUpdated: number
   studentsDeactivated: number
   coursesCreated: number
+  facultyAccountsCreated: number
   enrollmentsLinked: number
   enrollmentsUnlinked: number
   errorCount: number
