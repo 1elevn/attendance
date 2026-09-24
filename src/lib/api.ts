@@ -160,6 +160,7 @@ export async function submitAttendance(body: {
   lat: number
   lng: number
   deviceFingerprint?: string
+  deviceType?: 'laptop' | 'mobile'
 }) {
   return apiFetch<{
     /** 'recorded' when on time, 'late' when the window had already closed. */

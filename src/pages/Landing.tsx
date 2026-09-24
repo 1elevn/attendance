@@ -6,7 +6,6 @@ import {
   History, Settings, Clock, WifiOff,
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
-import { LaptopScreenshotNotice, getStudentFirstName } from '../components/student/LaptopScreenshotNotice'
 import { submitAttendance, ApiError, getApiErrorMessage } from '../lib/api'
 import { usePageTitle } from '../hooks/usePageTitle'
 import toast from 'react-hot-toast'
@@ -78,8 +77,6 @@ export default function Landing() {
   const [error, setError] = useState<ErrorCode | null>(null)
   const [sessionInfo, setSessionInfo] = useState<{ courseName: string; courseCode: string } | null>(null)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-  const [isLaptop, setIsLaptop] = useState(false)
-  const [recordedAt, setRecordedAt] = useState<Date | null>(null)
   const studentIdRef = useRef<HTMLInputElement>(null)
 
   const normaliseCourseCode = (raw: string) => raw.toUpperCase().replace(/\s/g, '')
@@ -104,7 +101,12 @@ export default function Landing() {
       return
     }
     setStage('locating')
-    setIsLaptop(!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
+    // Recorded on the check-in so faculty can see it during review. Laptops
+    // locate over WiFi and land further from the room, which matters to whoever
+    // is judging a borderline absence — not to the student, who cannot act on it.
+    const deviceType = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+      ? ('mobile' as const)
+      : ('laptop' as const)
 
     // Location is required — attendance cannot be submitted without coordinates.
     // If the student denies permission or the device has no geolocation, show a
@@ -152,14 +154,9 @@ export default function Landing() {
         lat,
         lng,
         deviceFingerprint,
+        deviceType,
       })
       setSessionInfo({ courseName: result.courseName, courseCode: result.courseCode })
-      setRecordedAt(new Date(result.recordedAt))
-      // A late check-in gets the same confirmation as an on-time one. The
-      // student's job is done the moment they tap; nothing they can do at this
-      // point changes the outcome, so there is nothing to alarm them with. The
-      // timestamp and the late flag go to the instructor's review screen, and
-      // show up in the student's own absence history afterwards.
       setStage('success')
       toast.success('Attendance recorded')
     } catch (err) {
@@ -203,7 +200,6 @@ export default function Landing() {
     setLocationBlockedReason(null)
     setError(null)
     setSessionInfo(null)
-    setRecordedAt(null)
   }
 
   const errorConfig = error ? ERROR_MESSAGES[error] : null
@@ -454,12 +450,6 @@ export default function Landing() {
                     <p className="text-xs text-ink-muted">{sessionInfo.courseCode}</p>
                     <p className="text-sm font-semibold text-ink-primary mt-0.5">{sessionInfo.courseName}</p>
                   </div>
-                )}
-                {isLaptop && recordedAt && (
-                  <LaptopScreenshotNotice
-                    studentFirstName={getStudentFirstName(studentId)}
-                    recordedAt={recordedAt}
-                  />
                 )}
               </motion.div>
 
