@@ -11,13 +11,13 @@ import {
 import type { Course } from '../../types'
 
 interface SetupFormState {
-  facultyId: string
+  facultyIds: string[]
   schedule: string
   room: string
 }
 
 function emptyForm(): SetupFormState {
-  return { facultyId: '', schedule: '', room: '' }
+  return { facultyIds: [], schedule: '', room: '' }
 }
 
 export default function AdminCourses() {
@@ -57,7 +57,7 @@ export default function AdminCourses() {
   function startEditing(course: Course) {
     setEditingId(course.id)
     setForm({
-      facultyId: course.facultyId ?? '',
+      facultyIds: course.facultyIds ?? [],
       schedule: course.schedule === 'Not yet scheduled' ? '' : course.schedule,
       room: course.room === 'TBD' ? '' : course.room,
     })
@@ -68,15 +68,24 @@ export default function AdminCourses() {
     setForm(emptyForm())
   }
 
+  function toggleFaculty(facultyId: string) {
+    setForm((f) => ({
+      ...f,
+      facultyIds: f.facultyIds.includes(facultyId)
+        ? f.facultyIds.filter((id) => id !== facultyId)
+        : [...f.facultyIds, facultyId],
+    }))
+  }
+
   async function saveSetup(courseId: string) {
-    if (!form.facultyId || !form.schedule.trim() || !form.room.trim()) {
-      toast.error('Faculty, schedule, and room are all required')
+    if (form.facultyIds.length === 0 || !form.schedule.trim() || !form.room.trim()) {
+      toast.error('At least one faculty member, plus schedule and room, are required')
       return
     }
     setIsSaving(true)
     try {
       const updated = await updateAdminCourse(courseId, {
-        facultyId: form.facultyId,
+        facultyIds: form.facultyIds,
         schedule: form.schedule.trim(),
         room: form.room.trim(),
       })
@@ -160,7 +169,10 @@ export default function AdminCourses() {
                         {course.department} · {course.cohort} · {course.enrolledCount} enrolled
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {course.facultyName || 'Unassigned'} · {course.schedule} · {course.room}
+                        {course.faculty && course.faculty.length > 0
+                          ? course.faculty.map((f) => f.name).join(', ')
+                          : course.facultyName || 'Unassigned'}{' '}
+                        · {course.schedule} · {course.room}
                       </p>
                     </div>
 
@@ -177,21 +189,24 @@ export default function AdminCourses() {
                   {editingId === course.id && (
                     <div className="px-5 pb-4 pt-1 border-t border-gray-100 bg-gray-50/50">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                        <label className="block">
-                          <span className="text-xs font-medium text-gray-500">Faculty</span>
-                          <select
-                            value={form.facultyId}
-                            onChange={(e) => setForm((f) => ({ ...f, facultyId: e.target.value }))}
-                            className="mt-1 w-full border border-gray-200 bg-white rounded-lg px-2.5 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="">Select faculty</option>
+                        <div className="block">
+                          <span className="text-xs font-medium text-gray-500">
+                            Faculty (lecturer + any FIs — all can take attendance)
+                          </span>
+                          <div className="mt-1 w-full border border-gray-200 bg-white rounded-lg px-2.5 py-1.5 max-h-32 overflow-auto space-y-1">
                             {faculty.map((f) => (
-                              <option key={f.id} value={f.id}>
+                              <label key={f.id} className="flex items-center gap-1.5 text-sm text-gray-700">
+                                <input
+                                  type="checkbox"
+                                  checked={form.facultyIds.includes(f.id)}
+                                  onChange={() => toggleFaculty(f.id)}
+                                  className="rounded border-gray-300"
+                                />
                                 {f.name}
-                              </option>
+                              </label>
                             ))}
-                          </select>
-                        </label>
+                          </div>
+                        </div>
                         <label className="block">
                           <span className="text-xs font-medium text-gray-500">Schedule</span>
                           <input

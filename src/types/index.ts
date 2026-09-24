@@ -12,7 +12,9 @@ export interface Course {
   credits: number
   schedule: string
   room: string
-  facultyId: string | null
+  facultyIds: string[]
+  // Populated (id + name) by admin endpoints only; faculty's own "my courses" omits it.
+  faculty?: { id: string; name: string }[]
   facultyName: string
   cohort: string
   cohortCode: string   // e.g. "CS201_A" — students use this to check in

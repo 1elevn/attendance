@@ -107,6 +107,17 @@ export async function apiLogout() {
   return apiFetch<void>('/auth/logout', { method: 'POST' })
 }
 
+export async function validateActivationToken(token: string) {
+  return apiFetch<{ name: string }>(`/auth/activate/${token}`)
+}
+
+export async function activateAccount(token: string, password: string) {
+  return apiFetch<{ token: string; user: { id: string; name: string; role: 'faculty' | 'admin' } }>(
+    '/auth/activate',
+    { method: 'POST', body: JSON.stringify({ token, password }) },
+  )
+}
+
 // ─── Students ─────────────────────────────────────────────────────────────────
 
 export type StudentInfo = { id: string; name: string; email: string; program: string; year: number }
@@ -316,7 +327,7 @@ export async function updateAdminCourse(
     credits: number
     schedule: string
     room: string
-    facultyId: string
+    facultyIds: string[]
     cohort: string
     cohortCode: string
     enrolledCount: number
@@ -333,10 +344,27 @@ export interface AdminFaculty {
   name: string
   email: string
   department: string
+  source: 'camu' | 'manual'
+  activated: boolean
+  invitedAt: string | null
 }
 
 export async function getAdminFaculty() {
   return apiFetch<AdminFaculty[]>('/admin/faculty')
+}
+
+export async function sendFacultyInvite(id: string) {
+  return apiFetch<{ invitedAt: string }>(`/admin/faculty/${id}/invite`, { method: 'POST' })
+}
+
+export interface BulkInviteResult {
+  sent: number
+  failed: number
+  failures: { email: string; error: string }[]
+}
+
+export async function sendBulkFacultyInvites() {
+  return apiFetch<BulkInviteResult>('/admin/faculty/invite-bulk', { method: 'POST' })
 }
 
 // ─── Camu sync ────────────────────────────────────────────────────────────────

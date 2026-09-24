@@ -61,6 +61,16 @@ export function FacultyLayout({ children }: FacultyLayoutProps) {
                   Students
                 </NavLink>
                 <NavLink
+                  to="/admin/faculty"
+                  className={({ isActive }) =>
+                    `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
+                      isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated'
+                    }`
+                  }
+                >
+                  Faculty
+                </NavLink>
+                <NavLink
                   to="/admin/camu"
                   className={({ isActive }) =>
                     `text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
