@@ -6,7 +6,6 @@ import {
   History, Settings, Clock, WifiOff,
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
-import { LaptopScreenshotNotice, getStudentFirstName } from '../components/student/LaptopScreenshotNotice'
 import { submitAttendance, ApiError, getApiErrorMessage } from '../lib/api'
 import { usePageTitle } from '../hooks/usePageTitle'
 import toast from 'react-hot-toast'
@@ -51,7 +50,7 @@ function getGreeting() {
 }
 
 type Stage = 'form' | 'locating' | 'location_blocked' | 'success' | 'error'
-type ErrorCode = 'window_closed' | 'window_not_open' | 'duplicate_device' | 'invalid_pin'
+type ErrorCode = 'window_not_open' | 'duplicate_device' | 'invalid_pin'
 
 const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: boolean }> = {
   invalid_pin: {
@@ -61,10 +60,6 @@ const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: bo
   window_not_open: {
     title: "Too early!",
     body: "Your lecturer hasn't opened the attendance window yet. Hold tight — they'll let you know when to submit.",
-  },
-  window_closed: {
-    title: "Window has closed",
-    body: "Attendance for this session has already closed. If you were in class, speak to your lecturer.",
   },
   duplicate_device: {
     title: "Device already used",
@@ -82,8 +77,6 @@ export default function Landing() {
   const [error, setError] = useState<ErrorCode | null>(null)
   const [sessionInfo, setSessionInfo] = useState<{ courseName: string; courseCode: string } | null>(null)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-  const [isLaptop, setIsLaptop] = useState(false)
-  const [recordedAt, setRecordedAt] = useState<Date | null>(null)
   const studentIdRef = useRef<HTMLInputElement>(null)
 
   const normaliseCourseCode = (raw: string) => raw.toUpperCase().replace(/\s/g, '')
@@ -108,7 +101,12 @@ export default function Landing() {
       return
     }
     setStage('locating')
-    setIsLaptop(!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
+    // Recorded on the check-in so faculty can see it during review. Laptops
+    // locate over WiFi and land further from the room, which matters to whoever
+    // is judging a borderline absence — not to the student, who cannot act on it.
+    const deviceType = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+      ? ('mobile' as const)
+      : ('laptop' as const)
 
     // Location is required — attendance cannot be submitted without coordinates.
     // If the student denies permission or the device has no geolocation, show a
@@ -156,9 +154,9 @@ export default function Landing() {
         lat,
         lng,
         deviceFingerprint,
+        deviceType,
       })
       setSessionInfo({ courseName: result.courseName, courseCode: result.courseCode })
-      setRecordedAt(new Date())
       setStage('success')
       toast.success('Attendance recorded')
     } catch (err) {
@@ -168,8 +166,6 @@ export default function Landing() {
           setError('invalid_pin')
         } else if (errCode === 'window_not_open') {
           setError('window_not_open')
-        } else if (errCode === 'window_closed') {
-          setError('window_closed')
         } else if (errCode === 'duplicate_device') {
           setError('duplicate_device')
         } else if (errCode === 'duplicate_submission') {
@@ -204,7 +200,6 @@ export default function Landing() {
     setLocationBlockedReason(null)
     setError(null)
     setSessionInfo(null)
-    setRecordedAt(null)
   }
 
   const errorConfig = error ? ERROR_MESSAGES[error] : null
@@ -455,12 +450,6 @@ export default function Landing() {
                     <p className="text-xs text-ink-muted">{sessionInfo.courseCode}</p>
                     <p className="text-sm font-semibold text-ink-primary mt-0.5">{sessionInfo.courseName}</p>
                   </div>
-                )}
-                {isLaptop && recordedAt && (
-                  <LaptopScreenshotNotice
-                    studentFirstName={getStudentFirstName(studentId)}
-                    recordedAt={recordedAt}
-                  />
                 )}
               </motion.div>
 

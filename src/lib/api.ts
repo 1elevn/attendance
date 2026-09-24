@@ -133,9 +133,12 @@ export interface CourseAbsences {
   absences: {
     sessionId: string
     date: string
+    startTime: string
     status: AttendanceStatus
     note?: string
     absenceReason?: AbsenceReason
+    /** When the student actually checked in, if they did. ISO 8601. */
+    submittedAt?: string
     sessionStatus: Session['status']
   }[]
 }
@@ -150,6 +153,8 @@ export interface CourseAbsenceRecord {
   startTime: string
   status: AttendanceStatus
   absenceReason?: AbsenceReason
+  /** When the student actually checked in, if they did. ISO 8601. */
+  submittedAt?: string
   note?: string
   overriddenBy?: string
 }
@@ -166,11 +171,15 @@ export async function submitAttendance(body: {
   lat: number
   lng: number
   deviceFingerprint?: string
+  deviceType?: 'laptop' | 'mobile'
 }) {
-  return apiFetch<{ status: string; courseName: string; courseCode: string }>(
-    '/attendance/submit',
-    { method: 'POST', body: JSON.stringify(body) },
-  )
+  return apiFetch<{
+    /** 'recorded' when on time, 'late' when the window had already closed. */
+    status: 'recorded' | 'late'
+    recordedAt: string
+    courseName: string
+    courseCode: string
+  }>('/attendance/submit', { method: 'POST', body: JSON.stringify(body) })
 }
 
 export async function updateAttendanceRecord(
