@@ -56,6 +56,7 @@ export function absenceReasonLabel(reason: AbsenceReason): string {
   const map: Record<AbsenceReason, string> = {
     location_undetected: 'Location undetected',
     did_not_check_in: 'Did not check in',
+    checked_in_late: 'Checked in late',
   }
   return map[reason]
 }

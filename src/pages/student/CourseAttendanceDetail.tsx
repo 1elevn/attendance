@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, MapPin, AlertCircle, GraduationCap } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, MapPin, AlertCircle, GraduationCap } from 'lucide-react'
 import { getStudent, getCourseAbsences, ApiError } from '../../lib/api'
 import type { StudentInfo, CourseAbsenceRecord } from '../../lib/api'
 import { StatusBadge } from '../../components/ui/Badge'
@@ -136,6 +136,24 @@ export default function CourseAttendanceDetail() {
                       <MapPin size={11} className="text-ink-muted flex-shrink-0" />
                       <p className="text-xs text-ink-secondary">
                         {absenceReasonLabel(rec.absenceReason)}
+                      </p>
+                    </div>
+                  )}
+
+                  {rec.submittedAt && (
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <Clock size={11} className="text-ink-muted flex-shrink-0" />
+                      <p className="text-xs text-ink-secondary">
+                        Checked in at{' '}
+                        <span className="font-mono text-ink-primary">
+                          {new Date(rec.submittedAt).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        {rec.startTime && (
+                          <span className="text-ink-muted"> · class started {rec.startTime}</span>
+                        )}
                       </p>
                     </div>
                   )}
