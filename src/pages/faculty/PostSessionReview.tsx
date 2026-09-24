@@ -71,8 +71,9 @@ export default function PostSessionReview() {
   const statusOrder: Record<AttendanceStatus, number> = {
     absent_unexcused: 0,
     absent_excused: 1,
-    recorded: 2,
-    pending: 3,
+    late: 2,
+    recorded: 3,
+    pending: 4,
   }
 
   const filtered = records
@@ -86,6 +87,7 @@ export default function PostSessionReview() {
 
   const stats = {
     recorded: records.filter(r => r.status === 'recorded').length,
+    late: records.filter(r => r.status === 'late').length,
     excused: records.filter(r => r.status === 'absent_excused').length,
     unexcused: records.filter(r => r.status === 'absent_unexcused').length,
   }
@@ -95,6 +97,16 @@ export default function PostSessionReview() {
       const updated = await updateAttendanceRecord(id, { status: 'recorded' })
       setRecords(prev => prev.map(r => r.id === id ? updated : r))
       toast.success('Marked as present')
+    } catch {
+      toast.error('Failed to update record')
+    }
+  }
+
+  const markLate = async (id: string) => {
+    try {
+      const updated = await updateAttendanceRecord(id, { status: 'late' })
+      setRecords(prev => prev.map(r => r.id === id ? updated : r))
+      toast.success('Marked as late')
     } catch {
       toast.error('Failed to update record')
     }
@@ -166,7 +178,9 @@ export default function PostSessionReview() {
             <div>
               <p className="text-sm font-semibold text-ink-primary">DBSCAN completed</p>
               <p className="text-xs text-ink-secondary mt-0.5">
-                <strong className="text-success">{stats.recorded} students</strong> in attendance cluster
+                <strong className="text-success">{stats.recorded} present</strong>
+                {stats.late > 0 && <> · <strong className="text-warning">{stats.late} late</strong></>}
+                {' '}in attendance cluster
                 {session && <> · ε = {session.epsilon}m · min_samples = {session.minSamples}</>}
                 {' · '}Isolated GPS noise points marked absent
               </p>
@@ -174,9 +188,10 @@ export default function PostSessionReview() {
           </motion.div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: 'Recorded', value: stats.recorded, color: 'text-success', bg: 'bg-success/5 border-success/15' },
+              { label: 'Present', value: stats.recorded, color: 'text-success', bg: 'bg-success/5 border-success/15' },
+              { label: 'Late', value: stats.late, color: 'text-warning', bg: 'bg-warning/5 border-warning/15' },
               { label: 'Excused Absent', value: stats.excused, color: 'text-warning', bg: 'bg-warning/5 border-warning/15' },
               { label: 'Unexcused Absent', value: stats.unexcused, color: 'text-danger', bg: 'bg-danger/5 border-danger/15' },
             ].map(s => (
@@ -202,7 +217,7 @@ export default function PostSessionReview() {
               className="flex-1 min-w-40"
             />
             <div className="flex gap-1">
-              {(['all', 'recorded', 'absent_excused', 'absent_unexcused'] as const).map(f => (
+              {(['all', 'recorded', 'late', 'absent_excused', 'absent_unexcused'] as const).map(f => (
                 <button
                   key={f}
                   onClick={() => setFilterAndScroll(f)}
@@ -213,7 +228,11 @@ export default function PostSessionReview() {
                       : 'text-ink-secondary hover:text-ink-primary bg-bg-surface border border-bg-border'
                   )}
                 >
-                  {f === 'all' ? 'All' : f === 'recorded' ? 'Recorded' : f === 'absent_excused' ? 'Excused' : 'Unexcused'}
+                  {f === 'all' ? 'All'
+                    : f === 'recorded' ? 'Present'
+                    : f === 'late' ? 'Late'
+                    : f === 'absent_excused' ? 'Excused'
+                    : 'Unexcused'}
                 </button>
               ))}
             </div>
@@ -255,14 +274,34 @@ export default function PostSessionReview() {
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <StatusBadge status={record.status} />
-                    {record.status === 'recorded' ? (
-                      <button
-                        onClick={() => markAbsent(record.id)}
-                        className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg text-danger bg-danger/8 hover:bg-danger/15 border border-danger/20 transition-all whitespace-nowrap"
-                      >
-                        <UserX size={12} />
-                        Mark absent
-                      </button>
+                    {record.status === 'recorded' || record.status === 'late' ? (
+                      <div className="flex items-center gap-1.5">
+                        {record.status === 'recorded' && (
+                          <button
+                            onClick={() => markLate(record.id)}
+                            className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg text-warning bg-warning/8 hover:bg-warning/15 border border-warning/20 transition-all whitespace-nowrap"
+                          >
+                            <Clock size={12} />
+                            Mark late
+                          </button>
+                        )}
+                        {record.status === 'late' && (
+                          <button
+                            onClick={() => markPresent(record.id)}
+                            className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg text-success bg-success/8 hover:bg-success/15 border border-success/20 transition-all whitespace-nowrap"
+                          >
+                            <UserCheck size={12} />
+                            Mark present
+                          </button>
+                        )}
+                        <button
+                          onClick={() => markAbsent(record.id)}
+                          className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg text-danger bg-danger/8 hover:bg-danger/15 border border-danger/20 transition-all whitespace-nowrap"
+                        >
+                          <UserX size={12} />
+                          Mark absent
+                        </button>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -271,6 +310,13 @@ export default function PostSessionReview() {
                         >
                           <UserCheck size={12} />
                           Mark present
+                        </button>
+                        <button
+                          onClick={() => markLate(record.id)}
+                          className="flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg text-warning bg-warning/8 hover:bg-warning/15 border border-warning/20 transition-all whitespace-nowrap"
+                        >
+                          <Clock size={12} />
+                          Mark late
                         </button>
                         <button
                           onClick={() => openNoteModal(record)}

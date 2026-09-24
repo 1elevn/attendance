@@ -1,6 +1,12 @@
 export type Role = 'student' | 'faculty' | 'admin'
 
-export type AttendanceStatus = 'recorded' | 'absent_excused' | 'absent_unexcused' | 'pending'
+export type AttendanceStatus =
+  | 'recorded'
+  /** Checked in after the present-grace window but within the late cutoff. */
+  | 'late'
+  | 'absent_excused'
+  | 'absent_unexcused'
+  | 'pending'
 
 export type AbsenceReason =
   | 'location_undetected'
