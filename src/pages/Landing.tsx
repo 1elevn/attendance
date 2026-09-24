@@ -50,7 +50,7 @@ function getGreeting() {
 }
 
 type Stage = 'form' | 'locating' | 'location_blocked' | 'success' | 'error'
-type ErrorCode = 'window_closed' | 'window_not_open' | 'duplicate_device' | 'invalid_pin'
+type ErrorCode = 'window_not_open' | 'duplicate_device' | 'invalid_pin'
 
 const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: boolean }> = {
   invalid_pin: {
@@ -60,10 +60,6 @@ const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: bo
   window_not_open: {
     title: "Too early!",
     body: "Your lecturer hasn't opened the attendance window yet. Hold tight — they'll let you know when to submit.",
-  },
-  window_closed: {
-    title: "Window has closed",
-    body: "Attendance for this session has already closed. If you were in class, speak to your lecturer.",
   },
   duplicate_device: {
     title: "Device already used",
@@ -170,8 +166,6 @@ export default function Landing() {
           setError('invalid_pin')
         } else if (errCode === 'window_not_open') {
           setError('window_not_open')
-        } else if (errCode === 'window_closed') {
-          setError('window_closed')
         } else if (errCode === 'duplicate_device') {
           setError('duplicate_device')
         } else if (errCode === 'duplicate_submission') {

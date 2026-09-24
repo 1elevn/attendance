@@ -6,12 +6,12 @@ import { Card, Divider } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { StatusBadge, Badge } from '../../components/ui/Badge'
 import { Avatar } from '../../components/ui/Avatar'
-import { Modal } from '../../components/ui/Modal'
+import { Modal, ConfirmModal } from '../../components/ui/Modal'
 import { Input } from '../../components/ui/Input'
-import { getSession, getSessionAttendance, updateAttendanceRecord, ApiError } from '../../lib/api'
+import { getSession, getSessionAttendance, updateAttendanceRecord, deleteSession, ApiError } from '../../lib/api'
 import type { CourseWithSession } from '../../lib/api'
 import type { AttendanceRecord, AttendanceStatus } from '../../types'
-import { formatDate, cn } from '../../lib/utils'
+import { formatDate, cn, absenceReasonLabel } from '../../lib/utils'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import toast from 'react-hot-toast'
 
@@ -34,7 +34,20 @@ export default function PostSessionReview() {
   const [filter, setFilter] = useState<'all' | AttendanceStatus>('all')
   const [noteModal, setNoteModal] = useState<{ record: AttendanceRecord } | null>(null)
   const [noteText, setNoteText] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
+
+  const handleDelete = async () => {
+    if (!sessionId) return
+    setConfirmDelete(false)
+    try {
+      await deleteSession(sessionId)
+      toast.success('Session deleted')
+      navigate(session ? `/faculty/courses/${session.courseId}` : '/faculty/courses')
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Failed to delete session')
+    }
+  }
 
   useEffect(() => {
     if (!sessionId) return
@@ -140,10 +153,20 @@ export default function PostSessionReview() {
         >
           <ArrowLeft size={16} />
         </button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-base font-semibold text-ink-primary">Session Review</p>
           <p className="text-xs text-ink-muted">{course?.code ?? ''} · {session ? formatDate(session.date) : '…'}</p>
         </div>
+        {session && (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            title="Delete this session and run it again"
+            className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-2 py-1 rounded-lg hover:bg-danger/10 flex-shrink-0"
+          >
+            <Trash2 size={14} />
+            Delete session
+          </button>
+        )}
       </div>
 
       {loading && (
@@ -250,6 +273,11 @@ export default function PostSessionReview() {
                         </span>
                       )}
                     </div>
+                    {record.absenceReason && (
+                      <p className="text-xs text-ink-secondary mt-0.5">
+                        {absenceReasonLabel(record.absenceReason)}
+                      </p>
+                    )}
                     {record.note && (
                       <p className="text-xs text-ink-secondary mt-0.5 italic">"{record.note}"</p>
                     )}
@@ -326,6 +354,24 @@ export default function PostSessionReview() {
           />
         </div>
       </Modal>
+
+      <ConfirmModal
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleDelete}
+        title="Delete this session?"
+        message={
+          <p>
+            This session and the {records.length} attendance{' '}
+            {records.length === 1 ? 'record' : 'records'} on it will be deleted permanently.
+            Every student loses their record for this session, present and absent alike, and
+            this cannot be undone. Create a new session afterwards to run it again.
+          </p>
+        }
+        confirmLabel="Yes, delete it"
+        cancelLabel="Keep it"
+        danger
+      />
     </div>
   )
 }

@@ -107,10 +107,10 @@ export default function LiveSession() {
       toast.success('Session cancelled')
       navigate(`/faculty/courses/${session.courseId}`)
     } catch (err) {
-      if (err instanceof ApiError && err.status === 409 && (err.body as { error?: string }).error === 'session_closed') {
-        // The background auto-close job beat us to it — session was already closed
-        // and attendance is finalized. Take the faculty to the review page.
-        toast('Session was already closed — showing attendance review')
+      if (err instanceof ApiError && err.status === 409 && (err.body as { error?: string }).error === 'session_processing') {
+        // The auto-close job is mid-flight. Once it lands the session can be
+        // deleted from the course page like any other closed session.
+        toast('Attendance is being finalised — showing attendance review')
         navigate(`/faculty/sessions/${sessionId}/review`, { state: { session, course } })
       } else {
         const msg = err instanceof ApiError ? err.message : 'Failed to cancel session'
@@ -181,7 +181,7 @@ export default function LiveSession() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {liveStatus === 'upcoming' && (
+          {(liveStatus === 'upcoming' || liveStatus === 'open') && (
             <Button
               variant="ghost"
               size="sm"
