@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { UserCheck, UserX, MessageSquare, AlertTriangle, Search, Clock, ArrowLeft, X, Laptop } from 'lucide-react'
+import { UserCheck, UserX, MessageSquare, AlertTriangle, Search, Clock, ArrowLeft, X, Laptop, Trash2 } from 'lucide-react'
 import { Card, Divider } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { StatusBadge, Badge } from '../../components/ui/Badge'
