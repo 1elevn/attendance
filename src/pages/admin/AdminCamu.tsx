@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { RefreshCw, Copy } from 'lucide-react'
+import { RefreshCw, Copy, Square, CheckCircle2, Loader2, Circle } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { getCamuSyncHistory, ApiError, type CamuSyncResult } from '../../lib/api'
+import { getCamuSyncHistory, ApiError, type CamuSyncResult, type CamuSyncPhase } from '../../lib/api'
 import { useCamuSyncStatus } from '../../hooks/useCamuSyncStatus'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
@@ -10,6 +10,63 @@ const STATUS_STYLES: Record<CamuSyncResult['status'], string> = {
   success: 'bg-emerald-50 text-emerald-600 border-emerald-200',
   partial: 'bg-amber-50 text-amber-600 border-amber-200',
   error: 'bg-red-50 text-red-600 border-red-200',
+  cancelled: 'bg-gray-100 text-gray-500 border-gray-200',
+}
+
+const PHASE_STEPS: { key: Exclude<CamuSyncPhase, 'done'>; label: string }[] = [
+  { key: 'resolving_term', label: 'Resolving term' },
+  { key: 'syncing_enrolments', label: 'Syncing enrolments & courses' },
+  { key: 'syncing_roster', label: 'Syncing student roster' },
+  { key: 'syncing_staff', label: 'Resolving staff & schedules' },
+]
+
+/**
+ * A checklist of the sync's fixed phases (there's no knowable total row/page
+ * count ahead of time -- see camuSync.ts -- so "what's left" is expressed as
+ * remaining phases, not a percentage bar), with live counters for the two
+ * that actually take a while.
+ */
+function PhaseChecklist({ status }: { status: CamuSyncResult }) {
+  const isDone = status.currentPhase === 'done'
+  const currentIndex = isDone
+    ? PHASE_STEPS.length
+    : PHASE_STEPS.findIndex((p) => p.key === status.currentPhase)
+
+  return (
+    <ul className="px-5 py-3 space-y-1.5">
+      {PHASE_STEPS.map((phase, i) => {
+        const isCurrent = !isDone && i === currentIndex && status.status === 'running'
+        const isCompleted = isDone || i < currentIndex
+        return (
+          <li key={phase.key} className="flex items-center gap-2 text-xs">
+            {isCurrent ? (
+              <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin flex-shrink-0" />
+            ) : isCompleted ? (
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+            ) : (
+              <Circle className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+            )}
+            <span className={isCompleted ? 'text-gray-500' : isCurrent ? 'text-gray-800 font-medium' : 'text-gray-400'}>
+              {phase.label}
+            </span>
+            {phase.key === 'syncing_enrolments' && (isCurrent || isCompleted) && (
+              <span className="text-gray-400">
+                — {status.coursesCreated} course{status.coursesCreated !== 1 ? 's' : ''}, {status.studentsCreated} student{status.studentsCreated !== 1 ? 's' : ''} created so far
+              </span>
+            )}
+            {phase.key === 'syncing_roster' && (isCurrent || isCompleted) && (
+              <span className="text-gray-400">
+                — {status.rosterPagesFetched} page{status.rosterPagesFetched !== 1 ? 's' : ''}, {status.rosterRowsFetched} row{status.rosterRowsFetched !== 1 ? 's' : ''} fetched so far
+              </span>
+            )}
+            {isCurrent && status.cancelRequested && (
+              <span className="text-amber-600 font-medium">— stopping…</span>
+            )}
+          </li>
+        )
+      })}
+    </ul>
+  )
 }
 
 function formatDuration(ms: number | null): string {
@@ -66,9 +123,10 @@ export default function AdminCamu() {
       .finally(() => setIsHistoryLoading(false))
   }
 
-  const { status, isLoading, isSyncing, start } = useCamuSyncStatus({
+  const { status, isLoading, isSyncing, start, stop } = useCamuSyncStatus({
     onSettled: () => loadHistory(1),
   })
+  const [isStopping, setIsStopping] = useState(false)
 
   useEffect(() => { loadHistory(1) }, [])
 
@@ -78,6 +136,18 @@ export default function AdminCamu() {
       toast.success('Camu sync started')
     } catch {
       // start() already toasted the specific error
+    }
+  }
+
+  async function handleStop() {
+    setIsStopping(true)
+    try {
+      await stop()
+      toast.success('Stop requested — the sync will wind down shortly')
+    } catch {
+      // stop() already toasted the specific error
+    } finally {
+      setIsStopping(false)
     }
   }
 
@@ -97,14 +167,26 @@ export default function AdminCamu() {
             <h1 className="text-sm font-semibold text-gray-800">Camu Sync</h1>
             <p className="text-xs text-gray-400 mt-0.5">Status, history, and errors for the Camu integration</p>
           </div>
-          <button
-            onClick={handleSync}
-            disabled={isSyncing}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Syncing…' : 'Sync now'}
-          </button>
+          <div className="flex items-center gap-2">
+            {isSyncing && (
+              <button
+                onClick={handleStop}
+                disabled={isStopping || status?.cancelRequested}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
+              >
+                <Square className="w-3 h-3 fill-current" />
+                {status?.cancelRequested ? 'Stopping…' : 'Stop sync'}
+              </button>
+            )}
+            <button
+              onClick={handleSync}
+              disabled={isSyncing}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing…' : 'Sync now'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -136,6 +218,11 @@ export default function AdminCamu() {
                   Started {formatDateTime(status.startedAt)} · Duration {formatDuration(status.durationMs)}
                   {status.academicYear && ` · ${status.academicYear} ${status.semester ?? ''}`}
                 </p>
+              </div>
+
+              {/* Phase checklist — what's synced, what's syncing now, what's left */}
+              <div className="border-b border-gray-100">
+                <PhaseChecklist status={status} />
               </div>
 
               {/* Counter grid — raw rows fetched per phase, plus outcome counts */}
