@@ -378,15 +378,19 @@ export async function sendBulkFacultyInvites() {
 
 // ─── Camu sync ────────────────────────────────────────────────────────────────
 
+export type CamuSyncPhase = 'resolving_term' | 'syncing_enrolments' | 'syncing_roster' | 'syncing_staff' | 'done'
+
 export interface CamuSyncResult {
   id: string
   startedAt: string
   finishedAt: string | null
   durationMs: number | null
-  status: 'running' | 'success' | 'partial' | 'error'
+  status: 'running' | 'success' | 'partial' | 'error' | 'cancelled'
   trigger: 'manual' | 'scheduled' | 'cli'
   triggeredBy: string | null
   triggeredByName: string | null
+  currentPhase: CamuSyncPhase | null
+  cancelRequested: boolean
   academicYear: string | null
   semester: string | null
   rosterPagesFetched: number
@@ -406,6 +410,10 @@ export interface CamuSyncResult {
 
 export async function triggerCamuSync() {
   return apiFetch<CamuSyncResult>('/admin/camu/sync', { method: 'POST' })
+}
+
+export async function stopCamuSync() {
+  return apiFetch<CamuSyncResult>('/admin/camu/sync/stop', { method: 'POST' })
 }
 
 export async function getCamuSyncStatus() {

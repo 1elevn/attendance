@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { ApiError, getCamuSyncStatus, triggerCamuSync, type CamuSyncResult } from '../lib/api'
+import { ApiError, getCamuSyncStatus, triggerCamuSync, stopCamuSync, type CamuSyncResult } from '../lib/api'
 
 const POLL_INTERVAL_MS = 3_000
 const MAX_POLL_DURATION_MS = 10 * 60_000
@@ -122,11 +122,27 @@ export function useCamuSyncStatus(opts?: { onSettled?: (log: CamuSyncResult) => 
     }
   }, [applyStatus, startPolling])
 
+  /** Requests cooperative cancellation — the run stops itself at its next
+   *  checkpoint, so `status` keeps polling as 'running' (with cancelRequested
+   *  true) for a bit before landing on 'cancelled'. */
+  const stop = useCallback(async () => {
+    try {
+      const result = await stopCamuSync()
+      applyStatus(result)
+    } catch (err) {
+      if (!(err instanceof ApiError && err.status === 401)) {
+        toast.error(err instanceof ApiError ? err.message : 'Failed to stop Camu sync')
+      }
+      throw err
+    }
+  }, [applyStatus])
+
   return {
     status,
     isLoading,
     isSyncing: status?.status === 'running',
     refresh,
     start,
+    stop,
   }
 }
