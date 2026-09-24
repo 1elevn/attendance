@@ -127,8 +127,10 @@ export default function CreateSessionModal({
     } catch (err) {
       if (err instanceof ApiError && (err.body?.error as string) === 'session_already_open') {
         toast.error('A session for this course is already open.')
-      } else if (err instanceof ApiError && (err.body?.error as string) === 'session_not_editable') {
-        toast.error('This session can no longer be edited.')
+      } else if (err instanceof ApiError && (err.body?.error as string) === 'session_closed') {
+        toast.error('This session is closed. Delete it if you need to run it again.')
+      } else if (err instanceof ApiError && (err.body?.error as string) === 'session_processing') {
+        toast.error('Attendance is being finalised. Try again in a moment.')
       } else if (err instanceof ApiError) {
         toast.error(getApiErrorMessage(err))
       } else {
@@ -147,7 +149,7 @@ export default function CreateSessionModal({
         title={isEdit ? 'Edit Session' : 'Create Session'}
         description={
           isEdit
-            ? 'Update the date, time, or settings for this upcoming session'
+            ? 'Update the date, time, or settings for this session. Check-ins already submitted are kept.'
             : 'Students submit attendance using the course code and their student ID'
         }
         size="md"
