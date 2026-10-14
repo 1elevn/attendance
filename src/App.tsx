@@ -6,6 +6,7 @@ import { FacultyLayout } from './components/layout/FacultyLayout'
 // Public student pages
 import Landing from './pages/Landing'
 import StaffLogin from './pages/StaffLogin'
+import Activate from './pages/Activate'
 import AttendanceHistory from './pages/student/AttendanceHistory'
 import CourseAttendanceDetail from './pages/student/CourseAttendanceDetail'
 
@@ -18,6 +19,10 @@ import FacultyDashboard from './pages/faculty/FacultyDashboard'
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminCourses from './pages/admin/AdminCourses'
+import AdminStudents from './pages/admin/AdminStudents'
+import AdminFaculty from './pages/admin/AdminFaculty'
+import AdminCamu from './pages/admin/AdminCamu'
 
 function FacultyProtected({ children }: { children: React.ReactNode }) {
   const { role } = useAppStore()
@@ -48,6 +53,7 @@ export default function App() {
             : <StaffLogin />
           }
         />
+        <Route path="/activate" element={<Activate />} />
 
         {/* Faculty — no sidebar */}
         <Route path="/faculty/courses" element={<FacultyProtected><FacultyCourses /></FacultyProtected>} />
@@ -60,6 +66,10 @@ export default function App() {
 
         {/* Admin */}
         <Route path="/admin/dashboard" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
+        <Route path="/admin/courses" element={<AdminProtected><AdminCourses /></AdminProtected>} />
+        <Route path="/admin/students" element={<AdminProtected><AdminStudents /></AdminProtected>} />
+        <Route path="/admin/faculty" element={<AdminProtected><AdminFaculty /></AdminProtected>} />
+        <Route path="/admin/camu" element={<AdminProtected><AdminCamu /></AdminProtected>} />
         <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
