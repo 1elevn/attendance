@@ -273,7 +273,7 @@ export default function Landing() {
                   id="course-code"
                   type="text"
                   placeholder="e.g. CS222A"
-                  maxLength={12}
+                  maxLength={40}
                   value={pin}
                   onChange={e => setPin(e.target.value.toUpperCase().replace(/\s/g, ''))}
                   onKeyDown={e => e.key === 'Enter' && studentIdRef.current?.focus()}
