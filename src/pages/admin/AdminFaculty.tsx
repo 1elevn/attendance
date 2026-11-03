@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Mail, Send } from 'lucide-react'
+import { Loader2, Mail, Search, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   getAdminFaculty,
@@ -13,6 +13,10 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 function formatDateTime(iso: string | null): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleString()
+}
+
+function normalizeForSearch(s: string): string {
+  return s.toLowerCase().replace(/\s+/g, ' ').trim()
 }
 
 function StatusBadge({ faculty }: { faculty: AdminFacultyRow }) {
@@ -44,6 +48,7 @@ export default function AdminFaculty() {
   const [isLoading, setIsLoading] = useState(true)
   const [invitingId, setInvitingId] = useState<string | null>(null)
   const [isBulkInviting, setIsBulkInviting] = useState(false)
+  const [query, setQuery] = useState('')
 
   function load() {
     setIsLoading(true)
@@ -69,6 +74,16 @@ export default function AdminFaculty() {
     })
   }, [camuFaculty])
   const pendingCount = camuFaculty.filter((f) => !f.activated).length
+
+  // Camu names sometimes carry doubled spaces ("Aaron Amarh  Ashitey"), so both
+  // sides are whitespace-collapsed before matching.
+  const trimmedQuery = normalizeForSearch(query)
+  const visibleFaculty = useMemo(() => {
+    if (!trimmedQuery) return sortedFaculty
+    return sortedFaculty.filter(
+      (f) => normalizeForSearch(f.name).includes(trimmedQuery) || normalizeForSearch(f.email).includes(trimmedQuery),
+    )
+  }, [sortedFaculty, trimmedQuery])
 
   async function invite(id: string) {
     setInvitingId(id)
@@ -111,18 +126,29 @@ export default function AdminFaculty() {
           <div>
             <h1 className="text-sm font-semibold text-gray-800">Faculty</h1>
             <p className="text-xs text-gray-400 mt-0.5">
-              {camuFaculty.length} synced from Camu
+              {trimmedQuery ? `${visibleFaculty.length} of ${camuFaculty.length} shown` : `${camuFaculty.length} synced from Camu`}
               {pendingCount > 0 && <span className="text-amber-600 font-medium"> · {pendingCount} pending</span>}
             </p>
           </div>
-          <button
-            onClick={inviteAllPending}
-            disabled={pendingCount === 0 || isBulkInviting}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-          >
-            {isBulkInviting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-            Invite all pending
-          </button>
+          <div className="flex items-center gap-3">
+            <label className="relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search name or email"
+                className="border border-gray-200 bg-gray-50 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </label>
+            <button
+              onClick={inviteAllPending}
+              disabled={pendingCount === 0 || isBulkInviting}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            >
+              {isBulkInviting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              Invite all pending
+            </button>
+          </div>
         </div>
       </div>
 
@@ -143,7 +169,14 @@ export default function AdminFaculty() {
             </div>
           )}
 
-          {!isLoading && sortedFaculty.length > 0 && (
+          {!isLoading && sortedFaculty.length > 0 && visibleFaculty.length === 0 && (
+            <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
+              <p className="font-medium text-gray-700">No faculty match “{query.trim()}”</p>
+              <p className="text-sm text-gray-400 mt-1">Try a different name or email.</p>
+            </div>
+          )}
+
+          {!isLoading && visibleFaculty.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
@@ -156,7 +189,7 @@ export default function AdminFaculty() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedFaculty.map((f) => (
+                  {visibleFaculty.map((f) => (
                     <tr key={f.id} className="border-b border-gray-50 last:border-0">
                       <td className="px-5 py-2.5 text-gray-700 font-medium whitespace-nowrap">{f.name}</td>
                       <td className="px-5 py-2.5 text-gray-500">{f.email}</td>
