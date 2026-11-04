@@ -3,6 +3,68 @@
 @tailwind utilities;
 
 @layer base {
+  /* Theme tokens. Values are space-separated RGB channels (see tailwind.config.js);
+     the .dim colors are full rgba() values and take no opacity modifier. */
+  :root {
+    color-scheme: light;
+    --c-bg-base: 248 250 252;
+    --c-bg-surface: 255 255 255;
+    --c-bg-card: 255 255 255;
+    --c-bg-elevated: 241 245 249;
+    --c-bg-border: 203 213 225;
+    --c-accent: 139 26 47;
+    --c-accent-light: 165 32 53;
+    --c-accent-dim: rgba(139, 26, 47, 0.08);
+    --c-success: 22 163 74;
+    --c-success-dim: rgba(22, 163, 74, 0.1);
+    --c-warning: 217 119 6;
+    --c-warning-dim: rgba(217, 119, 6, 0.1);
+    --c-danger: 220 38 38;
+    --c-danger-dim: rgba(220, 38, 38, 0.1);
+    --c-ink-primary: 15 23 42;
+    --c-ink-secondary: 71 85 105;
+    --c-ink-muted: 100 116 139;
+    --c-ink-faint: 148 163 184;
+    --scrollbar-thumb: #CBD5E1;
+    --scrollbar-thumb-hover: #94A3B8;
+    --dot: rgba(15, 23, 42, 0.09);
+    --shimmer: rgba(15, 23, 42, 0.04);
+    --shadow-sm: rgba(15, 23, 42, 0.08);
+    --shadow-sm2: rgba(15, 23, 42, 0.04);
+    --shadow-lg: rgba(15, 23, 42, 0.12);
+    --shadow-lg2: rgba(15, 23, 42, 0.06);
+  }
+
+  .dark {
+    color-scheme: dark;
+    --c-bg-base: 11 17 32;
+    --c-bg-surface: 17 24 39;
+    --c-bg-card: 17 24 39;
+    --c-bg-elevated: 30 41 59;
+    --c-bg-border: 51 65 85;
+    --c-accent: 201 58 82;
+    --c-accent-light: 224 85 105;
+    --c-accent-dim: rgba(201, 58, 82, 0.15);
+    --c-success: 34 197 94;
+    --c-success-dim: rgba(34, 197, 94, 0.15);
+    --c-warning: 245 158 11;
+    --c-warning-dim: rgba(245, 158, 11, 0.15);
+    --c-danger: 248 113 113;
+    --c-danger-dim: rgba(248, 113, 113, 0.15);
+    --c-ink-primary: 241 245 249;
+    --c-ink-secondary: 203 213 225;
+    --c-ink-muted: 148 163 184;
+    --c-ink-faint: 100 116 139;
+    --scrollbar-thumb: #334155;
+    --scrollbar-thumb-hover: #475569;
+    --dot: rgba(148, 163, 184, 0.12);
+    --shimmer: rgba(148, 163, 184, 0.08);
+    --shadow-sm: rgba(0, 0, 0, 0.4);
+    --shadow-sm2: rgba(0, 0, 0, 0.25);
+    --shadow-lg: rgba(0, 0, 0, 0.5);
+    --shadow-lg2: rgba(0, 0, 0, 0.3);
+  }
+
   *, *::before, *::after {
     box-sizing: border-box;
   }
@@ -13,8 +75,8 @@
   }
 
   body {
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: rgb(var(--c-bg-base));
+    color: rgb(var(--c-ink-primary));
     font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
   }
@@ -29,20 +91,20 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--scrollbar-thumb);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: var(--scrollbar-thumb-hover);
   }
 
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
-    -webkit-text-fill-color: #0F172A;
-    caret-color: #0F172A;
+    -webkit-box-shadow: 0 0 0 1000px rgb(var(--c-bg-surface)) inset;
+    -webkit-text-fill-color: rgb(var(--c-ink-primary));
+    caret-color: rgb(var(--c-ink-primary));
   }
 
   /* iOS zooms focused inputs below 16px — keep app-like scale on touch devices */
@@ -57,23 +119,23 @@
 
 @layer components {
   .glass {
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(15, 23, 42, 0.04);
+    background: rgb(var(--c-bg-surface));
+    border: 1px solid rgb(var(--c-bg-border));
+    box-shadow: 0 1px 3px var(--shadow-sm), 0 4px 16px var(--shadow-sm2);
   }
 
   .glass-elevated {
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.06);
+    background: rgb(var(--c-bg-surface));
+    border: 1px solid rgb(var(--c-bg-border));
+    box-shadow: 0 8px 32px var(--shadow-lg), 0 2px 8px var(--shadow-lg2);
   }
 
   .shimmer {
     background: linear-gradient(
       90deg,
-      rgba(15, 23, 42, 0) 0%,
-      rgba(15, 23, 42, 0.04) 50%,
-      rgba(15, 23, 42, 0) 100%
+      transparent 0%,
+      var(--shimmer) 50%,
+      transparent 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.8s infinite;
@@ -85,7 +147,7 @@
   }
 
   .dot-grid {
-    background-image: radial-gradient(circle, rgba(15, 23, 42, 0.09) 1px, transparent 1px);
+    background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 }

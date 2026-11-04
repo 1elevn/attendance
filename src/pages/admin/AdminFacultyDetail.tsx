@@ -62,33 +62,33 @@ export default function AdminFacultyDetail() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
         <div className="max-w-7xl mx-auto">
           <Link
             to="/admin/faculty"
-            className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-ink-secondary transition-colors"
           >
             <ArrowLeft className="w-3 h-3" />
             Faculty
           </Link>
-          <h1 className="text-sm font-semibold text-gray-800 mt-0.5">{faculty?.name ?? 'Faculty'}</h1>
+          <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary mt-0.5">{faculty?.name ?? 'Faculty'}</h1>
         </div>
       </div>
 
       <div className="flex-1 overflow-auto">
         <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
           {isLoading && (
-            <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 animate-pulse">
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
             </div>
           )}
 
           {!isLoading && !faculty && (
-            <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
-              <p className="font-medium text-gray-700">Faculty member not found</p>
-              <Link to="/admin/faculty" className="text-sm text-blue-600 hover:underline mt-1">
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-20 text-center">
+              <p className="font-medium text-gray-700 dark:text-ink-secondary">Faculty member not found</p>
+              <Link to="/admin/faculty" className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1">
                 Back to Faculty
               </Link>
             </div>
@@ -96,32 +96,32 @@ export default function AdminFacultyDetail() {
 
           {!isLoading && faculty && (
             <>
-              <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+              <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
                 <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-3 text-sm">
                   <div>
-                    <dt className="text-xs font-medium text-gray-400">Email</dt>
-                    <dd className="text-gray-700 mt-0.5 break-all">{faculty.email}</dd>
+                    <dt className="text-xs font-medium text-gray-400 dark:text-slate-500">Email</dt>
+                    <dd className="text-gray-700 dark:text-ink-secondary mt-0.5 break-all">{faculty.email}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-gray-400">Department</dt>
-                    <dd className="text-gray-700 mt-0.5">{faculty.department || '—'}</dd>
+                    <dt className="text-xs font-medium text-gray-400 dark:text-slate-500">Department</dt>
+                    <dd className="text-gray-700 dark:text-ink-secondary mt-0.5">{faculty.department || '—'}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-gray-400">Status</dt>
+                    <dt className="text-xs font-medium text-gray-400 dark:text-slate-500">Status</dt>
                     <dd className="mt-0.5">
                       <StatusBadge faculty={faculty} />
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-gray-400">Last invited</dt>
-                    <dd className="text-gray-700 mt-0.5 whitespace-nowrap">{formatDateTime(faculty.invitedAt)}</dd>
+                    <dt className="text-xs font-medium text-gray-400 dark:text-slate-500">Last invited</dt>
+                    <dd className="text-gray-700 dark:text-ink-secondary mt-0.5 whitespace-nowrap">{formatDateTime(faculty.invitedAt)}</dd>
                   </div>
                 </dl>
                 {!faculty.activated && (
                   <button
                     onClick={invite}
                     disabled={isInviting}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors whitespace-nowrap"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-bg-elevated text-gray-700 dark:text-ink-secondary hover:bg-gray-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors whitespace-nowrap"
                   >
                     {isInviting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mail className="w-3 h-3" />}
                     {faculty.invitedAt ? 'Resend' : 'Send invite'}
@@ -130,47 +130,47 @@ export default function AdminFacultyDetail() {
               </div>
 
               <div>
-                <h2 className="text-sm font-semibold text-gray-800">Courses</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <h2 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Courses</h2>
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                   {managedCourses.length} course{managedCourses.length !== 1 ? 's' : ''} · {totalStudents} enrolment
                   {totalStudents !== 1 ? 's' : ''}
                 </p>
               </div>
 
               {managedCourses.length === 0 ? (
-                <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-16 text-center">
-                  <p className="font-medium text-gray-700">No courses yet</p>
-                  <p className="text-sm text-gray-400 mt-1">
+                <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-16 text-center">
+                  <p className="font-medium text-gray-700 dark:text-ink-secondary">No courses yet</p>
+                  <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">
                     This faculty member isn’t assigned to any course. Courses appear here once a Camu sync links them.
                   </p>
                 </div>
               ) : (
-                <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto">
+                <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-100 text-left">
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Code</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Course</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Cohort</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Schedule</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Room</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500 text-right">Students</th>
-                        <th className="px-5 py-2.5 font-medium text-gray-500">Instructors</th>
+                      <tr className="border-b border-gray-100 dark:border-slate-800 text-left">
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Code</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Course</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Cohort</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Schedule</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Room</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted text-right">Students</th>
+                        <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Instructors</th>
                       </tr>
                     </thead>
                     <tbody>
                       {managedCourses.map((c) => (
-                        <tr key={c.id} className="border-b border-gray-50 last:border-0">
-                          <td className="px-5 py-2.5 text-gray-700 font-medium whitespace-nowrap">{c.code}</td>
-                          <td className="px-5 py-2.5 text-gray-700 min-w-[12rem]">{c.name}</td>
-                          <td className="px-5 py-2.5 text-gray-500 whitespace-nowrap">
+                        <tr key={c.id} className="border-b border-gray-50 dark:border-slate-800/60 last:border-0">
+                          <td className="px-5 py-2.5 text-gray-700 dark:text-ink-secondary font-medium whitespace-nowrap">{c.code}</td>
+                          <td className="px-5 py-2.5 text-gray-700 dark:text-ink-secondary min-w-[12rem]">{c.name}</td>
+                          <td className="px-5 py-2.5 text-gray-500 dark:text-ink-muted whitespace-nowrap">
                             {c.cohort}
-                            <span className="block text-xs text-gray-400">{c.cohortCode}</span>
+                            <span className="block text-xs text-gray-400 dark:text-slate-500">{c.cohortCode}</span>
                           </td>
-                          <td className="px-5 py-2.5 text-gray-500 min-w-[14rem]">{c.schedule || '—'}</td>
-                          <td className="px-5 py-2.5 text-gray-500 whitespace-nowrap">{c.room || '—'}</td>
-                          <td className="px-5 py-2.5 text-gray-700 text-right">{c.enrolledCount}</td>
-                          <td className="px-5 py-2.5 text-gray-500 min-w-[10rem]">
+                          <td className="px-5 py-2.5 text-gray-500 dark:text-ink-muted min-w-[14rem]">{c.schedule || '—'}</td>
+                          <td className="px-5 py-2.5 text-gray-500 dark:text-ink-muted whitespace-nowrap">{c.room || '—'}</td>
+                          <td className="px-5 py-2.5 text-gray-700 dark:text-ink-secondary text-right">{c.enrolledCount}</td>
+                          <td className="px-5 py-2.5 text-gray-500 dark:text-ink-muted min-w-[10rem]">
                             {c.faculty && c.faculty.length > 0
                               ? c.faculty.map((f) => f.name).join(', ')
                               : c.facultyName || '—'}

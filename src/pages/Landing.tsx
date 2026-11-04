@@ -5,6 +5,7 @@ import {
   MapPin, CheckCircle2, AlertCircle, GraduationCap,
   History, Settings, Clock, WifiOff,
 } from 'lucide-react'
+import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { Button } from '../components/ui/Button'
 import { submitAttendance, ApiError, getApiErrorMessage } from '../lib/api'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -208,6 +209,8 @@ export default function Landing() {
     <div className="min-h-screen flex flex-col items-center justify-center p-5 relative overflow-hidden dot-grid">
       {/* Ambient glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-accent/[0.06] rounded-full blur-3xl pointer-events-none" />
+
+      <ThemeToggle className="absolute top-4 right-14 text-ink-faint hover:text-ink-muted" />
 
       {/* Staff login — top right corner */}
       <motion.button

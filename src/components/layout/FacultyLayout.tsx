@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { GraduationCap, LogOut } from 'lucide-react'
 import { useAppStore } from '../../store'
 import { Avatar } from '../ui/Avatar'
+import { ThemeToggle } from '../ui/ThemeToggle'
 import { motion } from 'framer-motion'
 
 interface FacultyLayoutProps {
@@ -86,6 +87,7 @@ export function FacultyLayout({ children }: FacultyLayoutProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           {userName && (
             <div className="flex items-center gap-2">
               <Avatar name={userName} size="sm" />
