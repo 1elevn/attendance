@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GraduationCap, BookOpen, ShieldCheck, ChevronLeft, ArrowRight } from 'lucide-react'
+import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { useAppStore } from '../store'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
@@ -50,6 +51,8 @@ export default function StaffLogin() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-5 relative overflow-hidden dot-grid">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-64 bg-accent/[0.06] rounded-full blur-3xl pointer-events-none" />
+
+      <ThemeToggle className="absolute top-4 right-4 text-ink-faint hover:text-ink-muted" />
 
       <div className="relative w-full max-w-sm flex flex-col gap-6">
         {/* Back */}

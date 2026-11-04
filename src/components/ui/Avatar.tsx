@@ -15,8 +15,8 @@ function getColor(name: string): string {
     'bg-accent/15 text-accent',
     'bg-success/15 text-success',
     'bg-warning/15 text-warning',
-    'bg-purple-100 text-purple-700',
-    'bg-pink-100 text-pink-700',
+    'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400',
+    'bg-pink-100 dark:bg-pink-500/20 text-pink-700 dark:text-pink-400',
   ]
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)

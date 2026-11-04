@@ -23,20 +23,20 @@ function normalizeForSearch(s: string): string {
 export function StatusBadge({ faculty }: { faculty: AdminFacultyRow }) {
   if (faculty.activated) {
     return (
-      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-emerald-50 text-emerald-600 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 px-1.5 py-0.5 rounded-full">
         Activated
       </span>
     )
   }
   if (faculty.invitedAt) {
     return (
-      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full">
+      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 px-1.5 py-0.5 rounded-full">
         Invited
       </span>
     )
   }
   return (
-    <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-gray-100 text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded-full">
+    <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-gray-100 dark:bg-bg-elevated text-gray-500 dark:text-ink-muted border border-gray-200 dark:border-bg-border px-1.5 py-0.5 rounded-full">
       Not invited
     </span>
   )
@@ -123,23 +123,23 @@ export default function AdminFaculty() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-sm font-semibold text-gray-800">Faculty</h1>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Faculty</h1>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
               {trimmedQuery ? `${visibleFaculty.length} of ${camuFaculty.length} shown` : `${camuFaculty.length} synced from Camu`}
-              {pendingCount > 0 && <span className="text-amber-600 font-medium"> · {pendingCount} pending</span>}
+              {pendingCount > 0 && <span className="text-amber-600 dark:text-amber-400 font-medium"> · {pendingCount} pending</span>}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <label className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search name or email"
-                className="border border-gray-200 bg-gray-50 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </label>
             <button
@@ -157,36 +157,36 @@ export default function AdminFaculty() {
       <div className="flex-1 overflow-auto">
         <div className="max-w-7xl mx-auto px-6 py-8">
           {isLoading && (
-            <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 animate-pulse">
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
             </div>
           )}
 
           {!isLoading && sortedFaculty.length === 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
-              <p className="font-medium text-gray-700">No Camu-synced faculty yet</p>
-              <p className="text-sm text-gray-400 mt-1">Run a Camu sync to provision faculty accounts.</p>
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-20 text-center">
+              <p className="font-medium text-gray-700 dark:text-ink-secondary">No Camu-synced faculty yet</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">Run a Camu sync to provision faculty accounts.</p>
             </div>
           )}
 
           {!isLoading && sortedFaculty.length > 0 && visibleFaculty.length === 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
-              <p className="font-medium text-gray-700">No faculty match “{query.trim()}”</p>
-              <p className="text-sm text-gray-400 mt-1">Try a different name or email.</p>
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-20 text-center">
+              <p className="font-medium text-gray-700 dark:text-ink-secondary">No faculty match “{query.trim()}”</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">Try a different name or email.</p>
             </div>
           )}
 
           {!isLoading && visibleFaculty.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto">
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left">
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Name</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Email</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Status</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Last invited</th>
+                  <tr className="border-b border-gray-100 dark:border-slate-800 text-left">
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Name</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Email</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Status</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Last invited</th>
                     <th className="px-5 py-2.5" />
                   </tr>
                 </thead>
@@ -195,22 +195,22 @@ export default function AdminFaculty() {
                     <tr
                       key={f.id}
                       onClick={() => navigate(`/admin/faculty/${f.id}`)}
-                      className="border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50 transition-colors"
+                      className="border-b border-gray-50 dark:border-slate-800/60 last:border-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-bg-elevated/60 transition-colors"
                     >
-                      <td className="px-5 py-2.5 text-gray-700 font-medium whitespace-nowrap">
+                      <td className="px-5 py-2.5 text-gray-700 dark:text-ink-secondary font-medium whitespace-nowrap">
                         <Link
                           to={`/admin/faculty/${f.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="hover:text-blue-600 focus:outline-none focus-visible:underline"
+                          className="hover:text-blue-600 dark:hover:text-blue-300 focus:outline-none focus-visible:underline"
                         >
                           {f.name}
                         </Link>
                       </td>
-                      <td className="px-5 py-2.5 text-gray-500">{f.email}</td>
+                      <td className="px-5 py-2.5 text-gray-500 dark:text-ink-muted">{f.email}</td>
                       <td className="px-5 py-2.5">
                         <StatusBadge faculty={f} />
                       </td>
-                      <td className="px-5 py-2.5 text-gray-400 whitespace-nowrap">{formatDateTime(f.invitedAt)}</td>
+                      <td className="px-5 py-2.5 text-gray-400 dark:text-slate-500 whitespace-nowrap">{formatDateTime(f.invitedAt)}</td>
                       <td className="px-5 py-2.5 text-right whitespace-nowrap">
                         {!f.activated && (
                           <button
@@ -219,7 +219,7 @@ export default function AdminFaculty() {
                               invite(f.id)
                             }}
                             disabled={invitingId === f.id}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-bg-elevated text-gray-700 dark:text-ink-secondary hover:bg-gray-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
                           >
                             {invitingId === f.id ? (
                               <Loader2 className="w-3 h-3 animate-spin" />

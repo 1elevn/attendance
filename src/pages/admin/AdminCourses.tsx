@@ -101,14 +101,14 @@ export default function AdminCourses() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-sm font-semibold text-gray-800">Courses</h1>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Courses</h1>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
               {courses.length} course{courses.length !== 1 ? 's' : ''}
               {needsSetupCount > 0 && (
-                <span className="text-amber-600 font-medium"> · {needsSetupCount} need setup</span>
+                <span className="text-amber-600 dark:text-amber-400 font-medium"> · {needsSetupCount} need setup</span>
               )}
             </p>
           </div>
@@ -118,17 +118,17 @@ export default function AdminCourses() {
       <div className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-6 py-8">
           {isLoading && (
-            <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 animate-pulse">
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
             </div>
           )}
 
           {!isLoading && sortedCourses.length === 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
-              <p className="font-medium text-gray-700">No courses yet</p>
-              <p className="text-sm text-gray-400 mt-1">
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-20 text-center">
+              <p className="font-medium text-gray-700 dark:text-ink-secondary">No courses yet</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">
                 Sync from Camu on the dashboard, or add courses manually.
               </p>
             </div>
@@ -139,36 +139,36 @@ export default function AdminCourses() {
               {sortedCourses.map((course) => (
                 <div
                   key={course.id}
-                  className={`bg-white border rounded-xl overflow-hidden ${
-                    course.needsSetup ? 'border-amber-300' : 'border-gray-200'
+                  className={`bg-white dark:bg-bg-surface border rounded-xl overflow-hidden ${
+                    course.needsSetup ? 'border-amber-300 dark:border-amber-500/40' : 'border-gray-200 dark:border-bg-border'
                   }`}
                 >
                   <div className="px-5 py-4 flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-gray-800">{course.code}</p>
-                        <span className="text-xs text-gray-400">{course.name}</span>
+                        <p className="font-semibold text-gray-800 dark:text-ink-primary">{course.code}</p>
+                        <span className="text-xs text-gray-400 dark:text-slate-500">{course.name}</span>
                         {course.source === 'camu' && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold uppercase tracking-wide bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 px-1.5 py-0.5 rounded-full">
                             Camu
                           </span>
                         )}
                         {course.needsSetup ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 px-1.5 py-0.5 rounded-full">
                             <AlertTriangle className="w-3 h-3" />
                             Needs setup
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 px-1.5 py-0.5 rounded-full">
                             <CheckCircle2 className="w-3 h-3" />
                             Ready
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
                         {course.department} · {course.cohort} · {course.enrolledCount} enrolled
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                         {course.faculty && course.faculty.length > 0
                           ? course.faculty.map((f) => f.name).join(', ')
                           : course.facultyName || 'Unassigned'}{' '}
@@ -187,20 +187,20 @@ export default function AdminCourses() {
                   </div>
 
                   {editingId === course.id && (
-                    <div className="px-5 pb-4 pt-1 border-t border-gray-100 bg-gray-50/50">
+                    <div className="px-5 pb-4 pt-1 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-bg-elevated/30">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                         <div className="block">
-                          <span className="text-xs font-medium text-gray-500">
+                          <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">
                             Faculty (lecturer + any FIs — all can take attendance)
                           </span>
-                          <div className="mt-1 w-full border border-gray-200 bg-white rounded-lg px-2.5 py-1.5 max-h-32 overflow-auto space-y-1">
+                          <div className="mt-1 w-full border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface rounded-lg px-2.5 py-1.5 max-h-32 overflow-auto space-y-1">
                             {faculty.map((f) => (
-                              <label key={f.id} className="flex items-center gap-1.5 text-sm text-gray-700">
+                              <label key={f.id} className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-ink-secondary">
                                 <input
                                   type="checkbox"
                                   checked={form.facultyIds.includes(f.id)}
                                   onChange={() => toggleFaculty(f.id)}
-                                  className="rounded border-gray-300"
+                                  className="rounded border-gray-300 dark:border-slate-600"
                                 />
                                 {f.name}
                               </label>
@@ -208,21 +208,21 @@ export default function AdminCourses() {
                           </div>
                         </div>
                         <label className="block">
-                          <span className="text-xs font-medium text-gray-500">Schedule</span>
+                          <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">Schedule</span>
                           <input
                             value={form.schedule}
                             onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))}
                             placeholder="Mon/Wed 13:15–14:45"
-                            className="mt-1 w-full border border-gray-200 bg-white rounded-lg px-2.5 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="mt-1 w-full border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface rounded-lg px-2.5 py-1.5 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </label>
                         <label className="block">
-                          <span className="text-xs font-medium text-gray-500">Room</span>
+                          <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">Room</span>
                           <input
                             value={form.room}
                             onChange={(e) => setForm((f) => ({ ...f, room: e.target.value }))}
                             placeholder="RB 100"
-                            className="mt-1 w-full border border-gray-200 bg-white rounded-lg px-2.5 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="mt-1 w-full border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface rounded-lg px-2.5 py-1.5 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </label>
                       </div>
@@ -238,7 +238,7 @@ export default function AdminCourses() {
                         <button
                           onClick={cancelEditing}
                           disabled={isSaving}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 dark:text-ink-muted hover:bg-gray-100 dark:hover:bg-bg-elevated transition-colors"
                         >
                           Cancel
                         </button>

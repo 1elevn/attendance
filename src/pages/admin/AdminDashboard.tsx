@@ -211,28 +211,28 @@ export default function AdminDashboard() {
     <div className="min-h-0 flex flex-col">
 
       {/* ── Sticky toolbar ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-3">
 
           {/* Week nav */}
-          <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg px-1 py-1">
+          <div className="flex items-center gap-1 bg-gray-50 dark:bg-bg-elevated/40 border border-gray-200 dark:border-bg-border rounded-lg px-1 py-1">
             <button
               onClick={() => navigateWeek(-1)}
               disabled={!canGoPrev}
-              className="p-1.5 rounded-md text-gray-500 hover:bg-white hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              className="p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <div className="px-3 text-center min-w-[210px]">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block leading-none mb-0.5">
+              <span className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide block leading-none mb-0.5">
                 {relLabel}
               </span>
-              <span className="text-sm font-medium text-gray-800">{weekLabel}</span>
+              <span className="text-sm font-medium text-gray-800 dark:text-ink-primary">{weekLabel}</span>
             </div>
             <button
               onClick={() => navigateWeek(1)}
               disabled={!canGoNext}
-              className="p-1.5 rounded-md text-gray-500 hover:bg-white hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              className="p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
           <select
             value={courseFilter}
             onChange={e => setCourseFilter(e.target.value)}
-            className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All courses</option>
             {courses.map(c => (
@@ -254,12 +254,12 @@ export default function AdminDashboard() {
 
           {/* Student search */}
           <label className="relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={studentSearch}
               onChange={e => setStudentSearch(e.target.value)}
               placeholder="Search student or program"
-              className="border border-gray-200 bg-gray-50 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
 
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
             <select
               value={programFilter}
               onChange={e => setProgramFilter(e.target.value)}
-              className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All programs</option>
               {programs.map((program) => (
@@ -280,7 +280,7 @@ export default function AdminDashboard() {
             <select
               value={yearFilter}
               onChange={e => setYearFilter(e.target.value)}
-              className="border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All years</option>
               {years.map((year) => (
@@ -294,8 +294,8 @@ export default function AdminDashboard() {
               onClick={() => toggleStatusFilter('flagged')}
               className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
                 statusFilters.flagged
-                  ? 'bg-red-50 text-red-600 border-red-200'
-                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                  ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30'
+                  : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
               }`}
             >
               Flagged
@@ -304,8 +304,8 @@ export default function AdminDashboard() {
               onClick={() => toggleStatusFilter('recurring')}
               className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
                 statusFilters.recurring
-                  ? 'bg-amber-50 text-amber-600 border-amber-200'
-                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                  ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/30'
+                  : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
               }`}
             >
               Recurring
@@ -314,8 +314,8 @@ export default function AdminDashboard() {
               onClick={() => toggleStatusFilter('unexcused')}
               className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
                 statusFilters.unexcused
-                  ? 'bg-gray-100 text-gray-700 border-gray-300'
-                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                  ? 'bg-gray-100 dark:bg-bg-elevated text-gray-700 dark:text-ink-secondary border-gray-300 dark:border-slate-600'
+                  : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
               }`}
             >
               Unexcused
@@ -326,7 +326,7 @@ export default function AdminDashboard() {
           <button
             onClick={handleCamuSync}
             disabled={isSyncing}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
             title="Pull students and enrollments from Camu"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -337,19 +337,19 @@ export default function AdminDashboard() {
           {!isLoading && filteredSummaries.length > 0 && (
             <div className="flex items-center gap-2">
               {flaggedCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-50 text-red-600 border border-red-200 px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 px-2.5 py-1 rounded-full">
                   <Flag className="w-3 h-3 fill-red-500" />
                   {flaggedCount} flagged
                 </span>
               )}
               {recurringCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 px-2.5 py-1 rounded-full">
                   <AlertTriangle className="w-3 h-3" />
                   {recurringCount} recurring
                 </span>
               )}
               {flaggedCount === 0 && recurringCount === 0 && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-400 dark:text-slate-500">
                   {filteredSummaries.length} student{filteredSummaries.length !== 1 ? 's' : ''} shown
                 </span>
               )}
@@ -364,12 +364,12 @@ export default function AdminDashboard() {
 
           {/* Loading state */}
           {isLoading && (
-            <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 animate-pulse">
-              <div className="h-4 w-40 bg-gray-200 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
-              <div className="h-10 bg-gray-100 rounded" />
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
+              <div className="h-4 w-40 bg-gray-200 dark:bg-slate-700 rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
+              <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
             </div>
           )}
 
@@ -377,7 +377,7 @@ export default function AdminDashboard() {
           {!isLoading && (
             <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 items-start">
               {/* Pinned students rail */}
-              <aside className="bg-white border border-gray-200 rounded-xl overflow-hidden lg:sticky lg:top-24">
+              <aside className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-hidden lg:sticky lg:top-24">
                 <AnimatePresence initial={false}>
                   {pinnedStudents.length === 0 && (
                     <motion.div
@@ -386,37 +386,37 @@ export default function AdminDashboard() {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                      className="overflow-hidden border-b border-gray-100"
+                      className="overflow-hidden border-b border-gray-100 dark:border-slate-800"
                     >
                       <div className="px-4 py-3">
-                        <h3 className="text-sm font-semibold text-gray-700">Pinned students</h3>
-                        <p className="text-xs text-gray-400 mt-0.5">Always visible for quick follow-up</p>
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-ink-secondary">Pinned students</h3>
+                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Always visible for quick follow-up</p>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
                 {pinnedStudents.length === 0 ? (
-                  <div className="px-4 py-5 text-xs text-gray-400">
+                  <div className="px-4 py-5 text-xs text-gray-400 dark:text-slate-500">
                     Pin from the table to keep students here whenever you return.
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-gray-100 dark:divide-slate-800">
                     {pinnedStudents.map((student) => (
                       <div key={student.id} className="px-4 py-3 flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-800 truncate">{student.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{student.program} · Year {student.year}</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-ink-primary truncate">{student.name}</p>
+                          <p className="text-xs text-gray-400 dark:text-slate-500 truncate">{student.program} · Year {student.year}</p>
                           <button
                             onClick={() => navigate(`/history?id=${student.studentId}`)}
-                            className="mt-2 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                            className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                           >
                             View history
                           </button>
                         </div>
                         <button
                           onClick={() => togglePinnedStudent(student.id)}
-                          className="mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                          className="mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-ink-primary hover:bg-gray-100 dark:hover:bg-bg-elevated transition-colors"
                           title="Unpin student"
                         >
                           <PinOff className="w-3.5 h-3.5" />
@@ -428,27 +428,27 @@ export default function AdminDashboard() {
               </aside>
 
               {filteredSummaries.length === 0 ? (
-                <div className="bg-white border border-gray-200 rounded-xl flex flex-col items-center justify-center py-20 text-center">
-                  <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-3">
+                <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-20 text-center">
+                  <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-500/10 flex items-center justify-center mb-3">
                     <span className="text-lg">✓</span>
                   </div>
-                  <p className="font-medium text-gray-700">
+                  <p className="font-medium text-gray-700 dark:text-ink-secondary">
                     {summaries.length === 0 ? 'No absences this week' : 'No students match these filters'}
                   </p>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">
                     {summaries.length === 0
                       ? 'All recorded sessions show full attendance.'
                       : 'Try another week/course or clear one or more filters.'}
                   </p>
                 </div>
               ) : (
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-hidden">
               {/* Legend */}
-              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-700">
+              <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-gray-700 dark:text-ink-secondary">
                   Absences · {relLabel}
                 </h2>
-                <div className="flex items-center gap-4 text-xs text-gray-400">
+                <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-slate-500">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                     Unexcused miss
@@ -470,16 +470,16 @@ export default function AdminDashboard() {
 
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left bg-gray-50/95 sticky top-0 z-10 backdrop-blur-sm">
-                    <th className="px-3 py-2.5 font-medium text-gray-500 text-center w-14">Pin</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500 w-1" />
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Student</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Course</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500">Sessions this week</th>
-                    <th className="px-5 py-2.5 font-medium text-gray-500 text-center">Status</th>
+                  <tr className="border-b border-gray-100 dark:border-slate-800 text-left bg-gray-50/95 dark:bg-bg-base/95 sticky top-0 z-10 backdrop-blur-sm">
+                    <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-ink-muted text-center w-14">Pin</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted w-1" />
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Student</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Course</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Sessions this week</th>
+                    <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-800/60">
                   {filteredSummaries.map(s => (
                     <AbsenceRow
                       key={`${s.studentId}-${s.courseId}`}
@@ -533,7 +533,7 @@ function SessionDots({
         ))}
       </div>
       {excusedCount > 0 && (
-        <span className="text-xs text-gray-400">+{excusedCount} excused</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">+{excusedCount} excused</span>
       )}
     </div>
   )
@@ -551,9 +551,9 @@ function AbsenceRow({
   onTogglePin: (studentId: string) => void
 }) {
   const accentClass = s.isWeeklyFlagged
-    ? 'border-l-red-500 bg-red-50/30'
+    ? 'border-l-red-500 bg-red-50/30 dark:bg-red-500/5'
     : s.isRecurring
-    ? 'border-l-amber-400 bg-amber-50/20'
+    ? 'border-l-amber-400 bg-amber-50/20 dark:bg-amber-500/5'
     : 'border-l-transparent'
 
   return (
@@ -563,8 +563,8 @@ function AbsenceRow({
           onClick={() => onTogglePin(s.studentId)}
           className={`inline-flex items-center justify-center w-7 h-7 rounded-md border transition-colors ${
             isPinned
-              ? 'border-blue-200 bg-blue-50 text-blue-600'
-              : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              ? 'border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-ink-secondary hover:bg-gray-100 dark:hover:bg-bg-elevated'
           }`}
           title={isPinned ? 'Unpin student row' : 'Pin student row to top'}
         >
@@ -576,11 +576,11 @@ function AbsenceRow({
 
       {/* Student */}
       <td className="px-5 py-3.5">
-        <p className={`font-semibold leading-tight ${s.isWeeklyFlagged ? 'text-gray-900' : 'text-gray-800'}`}>
+        <p className={`font-semibold leading-tight ${s.isWeeklyFlagged ? 'text-gray-900 dark:text-ink-primary' : 'text-gray-800 dark:text-ink-primary'}`}>
           {s.studentName}
         </p>
         {student && (
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
             {student.program} · Year {student.year}
           </p>
         )}
@@ -588,8 +588,8 @@ function AbsenceRow({
 
       {/* Course */}
       <td className="px-5 py-3.5">
-        <p className="font-medium text-gray-800">{s.courseCode}</p>
-        <p className="text-xs text-gray-400 mt-0.5">{s.courseName}</p>
+        <p className="font-medium text-gray-800 dark:text-ink-primary">{s.courseCode}</p>
+        <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{s.courseName}</p>
       </td>
 
       {/* Session dots */}
@@ -606,7 +606,7 @@ function AbsenceRow({
         <div className="flex items-center justify-center gap-2">
           {s.isWeeklyFlagged && (
             <span
-              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-500/20 px-2 py-0.5 rounded-full"
               title="Missed enough sessions to exceed the threshold this week"
             >
               <Flag className="w-3 h-3 fill-red-500" />
@@ -615,7 +615,7 @@ function AbsenceRow({
           )}
           {s.isRecurring && (
             <span
-              className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 rounded-full"
               title="Has been flagged in 2 or more of the last 4 weeks"
             >
               <AlertTriangle className="w-3 h-3" />
@@ -623,7 +623,7 @@ function AbsenceRow({
             </span>
           )}
           {!s.isWeeklyFlagged && !s.isRecurring && (
-            <span className="text-gray-300 text-xs">—</span>
+            <span className="text-gray-300 dark:text-slate-600 text-xs">—</span>
           )}
         </div>
       </td>

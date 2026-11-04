@@ -1,5 +1,11 @@
+// Semantic colors are CSS variables (see src/index.css) so the light/dark themes
+// swap by toggling the `dark` class on <html>. Variables hold space-separated RGB
+// channels so opacity modifiers like `bg-accent/10` keep working.
+const v = (name) => `rgb(var(--c-${name}) / <alpha-value>)`
+
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -8,34 +14,34 @@ export default {
       },
       colors: {
         bg: {
-          base: '#F8FAFC',
-          surface: '#FFFFFF',
-          card: '#FFFFFF',
-          elevated: '#F1F5F9',
-          border: '#CBD5E1',
+          base: v('bg-base'),
+          surface: v('bg-surface'),
+          card: v('bg-card'),
+          elevated: v('bg-elevated'),
+          border: v('bg-border'),
         },
         accent: {
-          DEFAULT: '#8B1A2F',
-          light: '#A52035',
-          dim: 'rgba(139,26,47,0.08)',
+          DEFAULT: v('accent'),
+          light: v('accent-light'),
+          dim: 'var(--c-accent-dim)',
         },
         success: {
-          DEFAULT: '#16A34A',
-          dim: 'rgba(22,163,74,0.1)',
+          DEFAULT: v('success'),
+          dim: 'var(--c-success-dim)',
         },
         warning: {
-          DEFAULT: '#D97706',
-          dim: 'rgba(217,119,6,0.1)',
+          DEFAULT: v('warning'),
+          dim: 'var(--c-warning-dim)',
         },
         danger: {
-          DEFAULT: '#DC2626',
-          dim: 'rgba(220,38,38,0.1)',
+          DEFAULT: v('danger'),
+          dim: 'var(--c-danger-dim)',
         },
         ink: {
-          primary: '#0F172A',
-          secondary: '#475569',
-          muted: '#64748B',
-          faint: '#94A3B8',
+          primary: v('ink-primary'),
+          secondary: v('ink-secondary'),
+          muted: v('ink-muted'),
+          faint: v('ink-faint'),
         },
       },
       animation: {
