@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2, Mail, Search, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   getAdminFaculty,
   sendFacultyInvite,
@@ -10,7 +11,7 @@ import {
 } from '../../lib/api'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
-function formatDateTime(iso: string | null): string {
+export function formatDateTime(iso: string | null): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleString()
 }
@@ -19,23 +20,23 @@ function normalizeForSearch(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim()
 }
 
-function StatusBadge({ faculty }: { faculty: AdminFacultyRow }) {
+export function StatusBadge({ faculty }: { faculty: AdminFacultyRow }) {
   if (faculty.activated) {
     return (
-      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-emerald-50 text-emerald-600 border border-emerald-200 px-1.5 py-0.5 rounded-full">
         Activated
       </span>
     )
   }
   if (faculty.invitedAt) {
     return (
-      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full">
+      <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full">
         Invited
       </span>
     )
   }
   return (
-    <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded-full">
+    <span className="inline-flex items-center text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap bg-gray-100 text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded-full">
       Not invited
     </span>
   )
@@ -43,6 +44,7 @@ function StatusBadge({ faculty }: { faculty: AdminFacultyRow }) {
 
 export default function AdminFaculty() {
   usePageTitle('Faculty')
+  const navigate = useNavigate()
 
   const [faculty, setFaculty] = useState<AdminFacultyRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -122,7 +124,7 @@ export default function AdminFaculty() {
   return (
     <div className="min-h-0 flex flex-col">
       <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-3">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold text-gray-800">Faculty</h1>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -153,7 +155,7 @@ export default function AdminFaculty() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           {isLoading && (
             <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 animate-pulse">
               <div className="h-10 bg-gray-100 rounded" />
@@ -177,7 +179,7 @@ export default function AdminFaculty() {
           )}
 
           {!isLoading && visibleFaculty.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-left">
@@ -190,8 +192,20 @@ export default function AdminFaculty() {
                 </thead>
                 <tbody>
                   {visibleFaculty.map((f) => (
-                    <tr key={f.id} className="border-b border-gray-50 last:border-0">
-                      <td className="px-5 py-2.5 text-gray-700 font-medium whitespace-nowrap">{f.name}</td>
+                    <tr
+                      key={f.id}
+                      onClick={() => navigate(`/admin/faculty/${f.id}`)}
+                      className="border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-5 py-2.5 text-gray-700 font-medium whitespace-nowrap">
+                        <Link
+                          to={`/admin/faculty/${f.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="hover:text-blue-600 focus:outline-none focus-visible:underline"
+                        >
+                          {f.name}
+                        </Link>
+                      </td>
                       <td className="px-5 py-2.5 text-gray-500">{f.email}</td>
                       <td className="px-5 py-2.5">
                         <StatusBadge faculty={f} />
@@ -200,7 +214,10 @@ export default function AdminFaculty() {
                       <td className="px-5 py-2.5 text-right whitespace-nowrap">
                         {!f.activated && (
                           <button
-                            onClick={() => invite(f.id)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              invite(f.id)
+                            }}
                             disabled={invitingId === f.id}
                             className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors"
                           >
