@@ -388,7 +388,7 @@ export default function Landing() {
                       <strong>1. Phone settings:</strong> Settings → Privacy &amp; Security → Location Services → <strong>Safari</strong> → <em>Ask Next Time Or When I Share</em>
                     </p>
                     <p className="text-xs text-ink-muted leading-relaxed">
-                      <strong>2. Website settings:</strong> in Safari, tap the <em>AA</em> icon in the address bar → Website Settings → Location → <em>Allow</em>
+                      <strong>2. Website settings:</strong> in Safari, tap the page menu icon in the address bar (a square with lines underneath) → tap the <em>three dots</em> → Website Settings → Location → <em>Allow</em>
                     </p>
                     <p className="text-xs text-ink-muted leading-relaxed">
                       <strong>3.</strong> Return here and tap <strong>Try again</strong> — tap <em>Allow</em> if Safari prompts you.
