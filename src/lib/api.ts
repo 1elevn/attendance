@@ -120,7 +120,7 @@ export async function activateAccount(token: string, password: string) {
 
 // ─── Students ─────────────────────────────────────────────────────────────────
 
-export type StudentInfo = { id: string; name: string; email: string; program: string; year: number }
+export type StudentInfo = { id: string; name: string; program: string; year: number }
 
 export async function getStudent(id: string) {
   return apiFetch<StudentInfo>(`/students/${id}`)
@@ -452,6 +452,44 @@ export async function getAdminStudents(opts?: { limit?: number; page?: number; q
   return apiFetch<{ data: AdminStudent[]; total: number; page: number; limit: number; pages: number }>(
     `/admin/students?${params}`,
   )
+}
+
+export interface AdminStudentEnrolment {
+  status: 'active' | 'dropped'
+  course: Course
+  present: number
+  excused: number
+  unexcused: number
+  total: number
+  /** Percent present across closed sessions, or null when there are none. */
+  rate: number | null
+}
+
+export interface AdminStudentHistoryItem {
+  id: string
+  sessionId: string
+  courseId: string
+  date: string
+  startTime: string
+  status: AttendanceStatus
+  absenceReason?: AbsenceReason
+  note?: string
+  submittedAt?: string
+  deviceType?: 'laptop' | 'mobile'
+  overridden: boolean
+}
+
+export interface AdminStudentDetail {
+  student: Omit<AdminStudent, 'courseIds' | 'courseCount'> & {
+    active: boolean
+    lastSyncedAt?: string
+  }
+  enrolments: AdminStudentEnrolment[]
+  history: AdminStudentHistoryItem[]
+}
+
+export async function getAdminStudent(id: string) {
+  return apiFetch<AdminStudentDetail>(`/admin/students/${encodeURIComponent(id)}`)
 }
 
 /**

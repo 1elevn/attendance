@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getAdminStudents, ApiError, type AdminStudent } from '../../lib/api'
@@ -9,6 +10,7 @@ const DEBOUNCE_MS = 300
 
 export default function AdminStudents() {
   usePageTitle('Students')
+  const navigate = useNavigate()
 
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
@@ -96,9 +98,21 @@ export default function AdminStudents() {
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-slate-800/60">
                     {students.map((s) => (
-                      <tr key={s.id}>
+                      <tr
+                        key={s.id}
+                        onClick={() => navigate(`/admin/students/${s.id}`)}
+                        className="cursor-pointer hover:bg-gray-50 dark:hover:bg-bg-elevated/60 transition-colors"
+                      >
                         <td className="px-5 py-3 font-medium text-gray-800 dark:text-ink-primary whitespace-nowrap">{s.studentId}</td>
-                        <td className="px-5 py-3 text-gray-700 dark:text-ink-secondary">{s.name}</td>
+                        <td className="px-5 py-3 text-gray-700 dark:text-ink-secondary">
+                          <Link
+                            to={`/admin/students/${s.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="hover:text-blue-600 dark:hover:text-blue-300 focus:outline-none focus-visible:underline"
+                          >
+                            {s.name}
+                          </Link>
+                        </td>
                         <td className="px-5 py-3 text-gray-500 dark:text-ink-muted">{s.email}</td>
                         <td className="px-5 py-3 text-gray-500 dark:text-ink-muted">{s.program || '—'}</td>
                         <td className="px-5 py-3">
