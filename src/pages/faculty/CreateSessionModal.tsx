@@ -178,7 +178,7 @@ export default function CreateSessionModal({
           )}
 
           {/* Date + time */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
             <Input
               label="Date"
               type="date"
@@ -217,7 +217,7 @@ export default function CreateSessionModal({
             <button
               type="button"
               onClick={() => setShowAdvanced(p => !p)}
-              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink-secondary transition-colors"
+              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-ink-secondary transition-colors min-h-11 sm:min-h-0"
             >
               <ChevronDown size={13} className={`transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''}`} />
               Advanced settings

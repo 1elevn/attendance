@@ -38,7 +38,7 @@ export function Modal({ open, onClose, title, description, children, size = 'md'
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <motion.div
             ref={overlayRef}
             initial={{ opacity: 0 }}
@@ -54,12 +54,13 @@ export function Modal({ open, onClose, title, description, children, size = 'md'
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'relative w-full glass-elevated rounded-2xl z-10',
+              'relative w-full glass-elevated rounded-t-2xl sm:rounded-2xl z-10 flex flex-col',
+              'max-h-[90dvh] sm:max-h-[calc(100dvh-2rem)]',
               sizes[size]
             )}
           >
-            <div className="flex items-start justify-between p-6 pb-4">
-              <div>
+            <div className="flex items-start justify-between p-4 sm:p-6 pb-4 flex-shrink-0">
+              <div className="min-w-0">
                 <h2 className="text-lg font-semibold text-ink-primary">{title}</h2>
                 {description && (
                   <p className="text-sm text-ink-secondary mt-1">{description}</p>
@@ -67,16 +68,17 @@ export function Modal({ open, onClose, title, description, children, size = 'md'
               </div>
               <button
                 onClick={onClose}
-                className="ml-4 p-1.5 rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors flex-shrink-0"
+                aria-label="Close"
+                className="ml-4 -mt-1 -mr-1 w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors flex-shrink-0"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="px-6 pb-2">{children}</div>
+            <div className="px-4 sm:px-6 pb-2 overflow-y-auto flex-1 min-h-0">{children}</div>
 
             {footer && (
-              <div className="flex items-center justify-end gap-2 p-6 pt-4 border-t border-bg-border">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 p-4 sm:p-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-6 border-t border-bg-border flex-shrink-0 [&>button]:w-full sm:[&>button]:w-auto">
                 {footer}
               </div>
             )}

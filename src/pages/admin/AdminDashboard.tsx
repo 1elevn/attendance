@@ -442,7 +442,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               ) : (
-              <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-hidden">
+              <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-x-auto">
               {/* Legend */}
               <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-gray-700 dark:text-ink-secondary">
@@ -468,7 +468,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-slate-800 text-left bg-gray-50/95 dark:bg-bg-base/95 sticky top-0 z-10 backdrop-blur-sm">
                     <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-ink-muted text-center w-14">Pin</th>

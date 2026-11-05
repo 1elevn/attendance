@@ -124,7 +124,7 @@ export default function AdminFaculty() {
   return (
     <div className="min-h-0 flex flex-col">
       <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Faculty</h1>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
@@ -132,14 +132,14 @@ export default function AdminFaculty() {
               {pendingCount > 0 && <span className="text-amber-600 dark:text-amber-400 font-medium"> · {pendingCount} pending</span>}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <label className="relative">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <label className="relative w-full sm:w-auto">
               <Search className="w-4 h-4 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search name or email"
-                className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </label>
             <button

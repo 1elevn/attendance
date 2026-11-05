@@ -82,28 +82,29 @@ export default function CourseDetail() {
 
   return (
     <div className="flex flex-col h-full overflow-auto">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-bg-border">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3 px-4 sm:px-5 py-4 border-b border-bg-border">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => navigate('/faculty/courses')}
-            className="p-1.5 rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors"
+            aria-label="Back to courses"
+            className="w-11 h-11 sm:w-auto sm:h-auto flex items-center justify-center sm:p-1.5 rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors flex-shrink-0"
           >
             <ArrowLeft size={16} />
           </button>
-          <div>
-            <p className="text-base font-semibold text-ink-primary">{course?.name ?? '…'}</p>
-            <p className="text-xs text-ink-muted">
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-ink-primary truncate">{course?.name ?? '…'}</p>
+            <p className="text-xs text-ink-muted truncate">
               {course ? `${course.code} · ${course.cohort} · ${course.enrolledCount} students` : ''}
             </p>
           </div>
         </div>
-        <Button size="sm" onClick={() => setShowCreate(true)} disabled={loading}>
+        <Button size="sm" onClick={() => setShowCreate(true)} disabled={loading} className="flex-shrink-0">
           <Plus size={14} />
           New Session
         </Button>
       </div>
 
-      <div className="flex-1 p-6 max-w-xl space-y-6">
+      <div className="flex-1 p-4 sm:p-6 max-w-xl space-y-6">
 
         {loading && <div className="flex flex-col gap-2">{[0, 1, 2].map(i => <SessionRowSkeleton key={i} />)}</div>}
 
@@ -115,8 +116,8 @@ export default function CourseDetail() {
             animate={{ opacity: 1, y: 0 }}
             className="p-4 rounded-2xl border border-success/30 bg-success/5"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="relative w-2.5 h-2.5 flex-shrink-0">
                   <div className="absolute inset-0 rounded-full bg-success animate-ping opacity-60" />
                   <div className="w-2.5 h-2.5 rounded-full bg-success" />
@@ -282,13 +283,13 @@ function SessionRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       className={cn(
-        'flex items-center gap-3 p-4 rounded-2xl bg-bg-card border border-bg-border shadow-sm transition-all duration-200',
+        'flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-2 p-4 rounded-2xl bg-bg-card border border-bg-border shadow-sm transition-all duration-200',
         isClickable && 'cursor-pointer hover:border-accent/30 hover:bg-bg-elevated hover:shadow-md group'
       )}
       onClick={onClick}
     >
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-ink-primary">{formatDate(session.date)}</p>
           <SessionStatusBadge status={session.status} />
         </div>
@@ -309,11 +310,11 @@ function SessionRow({
       )}
 
       {(session.status === 'upcoming' || session.status === 'open') && (onEdit || onCancel) && (
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0 w-full sm:w-auto justify-end order-last sm:order-none">
           {onEdit && (
             <button
               onClick={e => { e.stopPropagation(); onEdit() }}
-              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-accent transition-colors px-2 py-1 rounded-lg hover:bg-accent/10"
+              className="flex items-center justify-center gap-1.5 text-xs text-ink-muted hover:text-accent transition-colors px-3 sm:px-2 py-1 min-h-11 sm:min-h-0 rounded-lg hover:bg-accent/10"
             >
               <Pencil size={14} />
               Edit
@@ -322,7 +323,7 @@ function SessionRow({
           {onCancel && (
             <button
               onClick={e => { e.stopPropagation(); onCancel() }}
-              className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-2 py-1 rounded-lg hover:bg-danger/10"
+              className="flex items-center justify-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-3 sm:px-2 py-1 min-h-11 sm:min-h-0 rounded-lg hover:bg-danger/10"
             >
               <XCircle size={14} />
               Cancel
@@ -335,7 +336,7 @@ function SessionRow({
         <button
           onClick={e => { e.stopPropagation(); onCancel() }}
           title="Delete this session and run it again"
-          className="flex items-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-2 py-1 rounded-lg hover:bg-danger/10 flex-shrink-0"
+          className="flex items-center justify-center gap-1.5 text-xs text-ink-muted hover:text-danger transition-colors px-2 py-1 min-h-11 sm:min-h-0 rounded-lg hover:bg-danger/10 flex-shrink-0"
         >
           <Trash2 size={14} />
           Delete
