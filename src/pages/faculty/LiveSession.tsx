@@ -157,15 +157,16 @@ export default function LiveSession() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-bg-border flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-5 py-4 border-b border-bg-border flex-shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => navigate(`/faculty/courses/${session.courseId}`)}
-            className="p-1.5 rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors"
+            aria-label="Back to course"
+            className="w-11 h-11 sm:w-auto sm:h-auto flex items-center justify-center sm:p-1.5 rounded-lg text-ink-muted hover:text-ink-secondary hover:bg-bg-elevated transition-colors flex-shrink-0"
           >
             <ArrowLeft size={16} />
           </button>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-base font-semibold text-ink-primary">
                 {liveStatus === 'upcoming' ? 'Session' : 'Live Session'}
@@ -177,10 +178,11 @@ export default function LiveSession() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-ink-muted">{course?.code ?? ''} · {course?.name ?? ''}</p>
+            <p className="text-xs text-ink-muted truncate">{course?.code ?? ''} · {course?.name ?? ''}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Below sm: Edit + Cancel share a row, Close Window gets its own full-width row so it isn't mis-tapped */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
           {(liveStatus === 'upcoming' || liveStatus === 'open') && (
             <Button
               variant="ghost"
@@ -216,7 +218,7 @@ export default function LiveSession() {
       </div>
 
       {/* Body — centered */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 gap-8">
 
         {/* Course code for student check-in */}
         <motion.div
@@ -225,7 +227,7 @@ export default function LiveSession() {
           className="text-center"
         >
           <p className="text-xs font-semibold text-ink-muted uppercase tracking-widest mb-3">Course code</p>
-          <p className="text-5xl sm:text-6xl font-black text-accent tracking-[0.2em] font-mono leading-none select-all cursor-text">
+          <p className="text-5xl sm:text-6xl font-black text-accent tracking-[0.2em] font-mono leading-none select-all cursor-text break-all">
             {courseCode}
           </p>
           <p className="text-xs text-ink-muted mt-2 max-w-xs mx-auto">
@@ -237,7 +239,7 @@ export default function LiveSession() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center gap-10"
+          className="flex items-center gap-6 sm:gap-10"
         >
           <div className="text-center">
             <p className="text-4xl font-bold text-ink-primary">

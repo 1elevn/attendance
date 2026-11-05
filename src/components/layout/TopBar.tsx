@@ -1,4 +1,3 @@
-import { Bell } from 'lucide-react'
 import { useAppStore } from '../../store'
 
 interface TopBarProps {
@@ -19,10 +18,6 @@ export function TopBar({ title, subtitle, actions }: TopBarProps) {
 
       <div className="flex items-center gap-2">
         {actions}
-        <button className="relative p-2 rounded-xl text-ink-muted hover:text-ink-primary hover:bg-bg-elevated transition-colors">
-          <Bell size={16} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-accent" />
-        </button>
       </div>
     </header>
   )

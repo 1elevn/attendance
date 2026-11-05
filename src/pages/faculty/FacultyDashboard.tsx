@@ -87,15 +87,15 @@ export default function FacultyDashboard() {
         }
       />
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 p-4 sm:p-6 space-y-6">
         {/* Live session banner */}
         {liveSession && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 rounded-2xl border border-success/30 bg-success/5 flex items-center justify-between"
+            className="p-4 rounded-2xl border border-success/30 bg-success/5 flex flex-wrap items-center justify-between gap-3"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="relative">
                 <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" />
                 <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-success animate-ping opacity-60" />
@@ -226,19 +226,19 @@ export default function FacultyDashboard() {
                         })
                       }
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
                           <p className="text-xs text-ink-muted">
                             {course?.code} · {course?.cohort} · {formatDate(session.date)}
                           </p>
-                          <p className="text-sm font-semibold text-ink-primary mt-0.5">{course?.name}</p>
-                          <div className="flex items-center gap-2 mt-1">
+                          <p className="text-sm font-semibold text-ink-primary mt-0.5 truncate">{course?.name}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-xs text-success">{present} present</span>
                             {unexcused > 0 && <span className="text-xs text-danger">{unexcused} unexcused</span>}
                             {excused > 0 && <span className="text-xs text-warning">{excused} excused</span>}
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <p className={`text-xl font-bold ${rate >= 80 ? 'text-success' : rate >= 60 ? 'text-warning' : 'text-danger'}`}>
                             {rate}%
                           </p>
