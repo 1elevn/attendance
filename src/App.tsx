@@ -23,6 +23,7 @@ import AdminCourses from './pages/admin/AdminCourses'
 import AdminStudents from './pages/admin/AdminStudents'
 import AdminFaculty from './pages/admin/AdminFaculty'
 import AdminFacultyDetail from './pages/admin/AdminFacultyDetail'
+import AdminStudentDetail from './pages/admin/AdminStudentDetail'
 import AdminCamu from './pages/admin/AdminCamu'
 
 function FacultyProtected({ children }: { children: React.ReactNode }) {
@@ -70,6 +71,7 @@ export default function App() {
         <Route path="/admin/courses" element={<AdminProtected><AdminCourses /></AdminProtected>} />
         <Route path="/admin/students" element={<AdminProtected><AdminStudents /></AdminProtected>} />
         <Route path="/admin/faculty" element={<AdminProtected><AdminFaculty /></AdminProtected>} />
+        <Route path="/admin/students/:id" element={<AdminProtected><AdminStudentDetail /></AdminProtected>} />
         <Route path="/admin/faculty/:id" element={<AdminProtected><AdminFacultyDetail /></AdminProtected>} />
         <Route path="/admin/camu" element={<AdminProtected><AdminCamu /></AdminProtected>} />
         <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
