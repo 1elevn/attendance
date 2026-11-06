@@ -182,6 +182,27 @@ export async function submitAttendance(body: {
   }>('/attendance/submit', { method: 'POST', body: JSON.stringify(body) })
 }
 
+/** Fire-and-forget report of a client-side failure. Never throws. */
+export function reportClientDiagnostic(body: {
+  event: 'geolocation_failed'
+  code?: number
+  message?: string
+  permissionState?: string
+  userAgent?: string
+  afterReload?: boolean
+}): void {
+  try {
+    void fetch(`${BASE}/attendance/client-diagnostics`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).catch(() => undefined)
+  } catch {
+    // diagnostics must never affect the check-in flow
+  }
+}
+
 export async function updateAttendanceRecord(
   recordId: string,
   body: { status?: AttendanceStatus; note?: string; absenceReason?: AbsenceReason },
