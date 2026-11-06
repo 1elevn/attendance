@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { Button } from '../components/ui/Button'
-import { submitAttendance, ApiError, getApiErrorMessage } from '../lib/api'
+import { submitAttendance, reportClientDiagnostic, ApiError, getApiErrorMessage } from '../lib/api'
 import { usePageTitle } from '../hooks/usePageTitle'
 import toast from 'react-hot-toast'
 
@@ -51,9 +51,28 @@ function getGreeting() {
 }
 
 type Stage = 'form' | 'locating' | 'location_blocked' | 'success' | 'error'
-type ErrorCode = 'window_not_open' | 'duplicate_device' | 'invalid_pin'
+type ErrorCode = 'window_not_open' | 'duplicate_device' | 'invalid_pin' | 'already_recorded'
+
+// Form values survive the reload that clears Safari's stale location-denied
+// state. sessionStorage only, read once on mount and removed straight away.
+const RELOAD_KEY = 'attn_reload_state'
+
+async function getGeolocationPermissionState(): Promise<string> {
+  try {
+    if (!navigator.permissions?.query) return 'unsupported'
+    const status = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
+    return status.state
+  } catch {
+    return 'unsupported'
+  }
+}
 
 const ERROR_MESSAGES: Record<ErrorCode, { title: string; body: string; soft?: boolean }> = {
+  already_recorded: {
+    title: "Already recorded",
+    body: "You've already checked in for this session. If this isn't the class you're in now, go back and check the course code you entered.",
+    soft: true,
+  },
   invalid_pin: {
     title: "Code not recognised",
     body: "We couldn't find an open session with that course code. Double-check the code with your lecturer and try again.",
@@ -79,6 +98,68 @@ export default function Landing() {
   const [sessionInfo, setSessionInfo] = useState<{ courseName: string; courseCode: string } | null>(null)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const studentIdRef = useRef<HTMLInputElement>(null)
+  const afterReloadRef = useRef(false)
+
+  // Restore details saved just before a location-recovery reload.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(RELOAD_KEY)
+      if (!raw) return
+      sessionStorage.removeItem(RELOAD_KEY)
+      const saved = JSON.parse(raw) as { pin?: string; studentId?: string }
+      if (typeof saved.pin === 'string') setPin(saved.pin)
+      if (typeof saved.studentId === 'string') setStudentId(saved.studentId)
+      afterReloadRef.current = true
+    } catch {
+      // storage unavailable — the student just re-enters their details
+    }
+  }, [])
+
+  const reloadKeepingDetails = () => {
+    try {
+      sessionStorage.setItem(RELOAD_KEY, JSON.stringify({ pin, studentId }))
+    } catch {
+      // storage unavailable — reload anyway
+    }
+    window.location.reload()
+  }
+
+  // Safari keeps reporting "denied" to an already-open page after the student
+  // fixes the setting, until the page is reloaded. While the blocked screen is
+  // showing, watch for the permission leaving "denied" (live change event, or
+  // when the student switches back from Settings) and reload automatically.
+  useEffect(() => {
+    if (stage !== 'location_blocked' || locationBlockedReason !== 'denied') return
+    if (!navigator.permissions?.query) return
+
+    let cancelled = false
+    let status: PermissionStatus | undefined
+
+    const recheck = async () => {
+      const state = await getGeolocationPermissionState()
+      if (!cancelled && (state === 'granted' || state === 'prompt')) reloadKeepingDetails()
+    }
+    const onVisible = () => { if (document.visibilityState === 'visible') void recheck() }
+
+    navigator.permissions
+      .query({ name: 'geolocation' as PermissionName })
+      .then(s => {
+        if (cancelled) return
+        status = s
+        s.addEventListener('change', recheck)
+      })
+      .catch(() => undefined)
+    document.addEventListener('visibilitychange', onVisible)
+
+    return () => {
+      cancelled = true
+      status?.removeEventListener('change', recheck)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+    // reloadKeepingDetails reads the latest pin/studentId from the render that
+    // set up this effect, which is the one that entered the blocked stage.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, locationBlockedReason])
 
   const normaliseCourseCode = (raw: string) => raw.toUpperCase().replace(/\s/g, '')
   const isReady = normaliseCourseCode(pin).length >= 4 && studentId.trim().length >= 3
@@ -133,7 +214,16 @@ export default function Landing() {
       lat = pos.coords.latitude
       lng = pos.coords.longitude
     } catch (geoErr) {
-      const code = (geoErr as GeolocationPositionError).code
+      const posErr = geoErr as GeolocationPositionError
+      const code = posErr.code
+      reportClientDiagnostic({
+        event: 'geolocation_failed',
+        code,
+        message: posErr.message?.slice(0, 300),
+        permissionState: await getGeolocationPermissionState(),
+        userAgent: navigator.userAgent.slice(0, 300),
+        afterReload: afterReloadRef.current,
+      })
       if (code === 1 /* PERMISSION_DENIED */) {
         setLocationBlockedReason('denied')
         setStage('location_blocked')
@@ -175,7 +265,7 @@ export default function Landing() {
             courseName: body.courseName ?? '',
             courseCode: body.courseCode ?? '',
           })
-          setError('duplicate_device')
+          setError('already_recorded')
         } else if (errCode === 'student_not_found') {
           toast.error('Student ID not found. Check your ID and try again.')
           setStage('form')
@@ -378,7 +468,7 @@ export default function Landing() {
                 <p className="font-bold text-lg text-warning">Location required</p>
                 <p className="text-sm text-ink-secondary mt-1.5 leading-relaxed">
                   {locationBlockedReason === 'denied'
-                    ? "Location access is blocked. Both your phone settings and this website must allow location — follow the steps below, then tap Try again."
+                    ? "Location access is blocked. Both your phone settings and this website must allow location — follow the steps below, then come back to this page. It will refresh by itself; if it doesn't, tap Refresh and try again."
                     : "Couldn't get your location. This usually means weak GPS signal indoors."}
                 </p>
               </div>
@@ -394,7 +484,10 @@ export default function Landing() {
                       <strong>2. Website settings:</strong> in Safari, tap the page menu icon in the address bar (a square with lines underneath) → tap the <em>three dots</em> → Website Settings → Location → <em>Allow</em>
                     </p>
                     <p className="text-xs text-ink-muted leading-relaxed">
-                      <strong>3.</strong> Return here and tap <strong>Try again</strong> — tap <em>Allow</em> if Safari prompts you.
+                      <strong>3.</strong> Return here and <strong>refresh the page</strong> (or tap <strong>Refresh and try again</strong> below) — tap <em>Allow</em> if Safari prompts you. Your details will be kept.
+                    </p>
+                    <p className="text-xs text-ink-muted leading-relaxed">
+                      Still blocked? Check Settings → Screen Time → Content &amp; Privacy Restrictions → Location Services is set to <em>Allow</em>.
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -403,7 +496,7 @@ export default function Landing() {
                       <strong>1. Phone settings:</strong> Settings → Privacy &amp; Security → Location Services → <strong>Chrome</strong> → <em>Ask Next Time Or When I Share</em>
                     </p>
                     <p className="text-xs text-ink-muted leading-relaxed">
-                      <strong>2.</strong> Return here and tap <strong>Try again</strong> — tap <em>Allow</em> if Chrome prompts you.
+                      <strong>2.</strong> Return here and <strong>refresh the page</strong> (or tap <strong>Refresh and try again</strong> below) — tap <em>Allow</em> if Chrome prompts you. Your details will be kept.
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -412,7 +505,7 @@ export default function Landing() {
                       <strong>1. Phone settings:</strong> Settings → Apps → Chrome → Permissions → Location → <em>Ask every time</em>
                     </p>
                     <p className="text-xs text-ink-muted leading-relaxed">
-                      <strong>2.</strong> Return here and tap <strong>Try again</strong> — tap <em>Allow</em> if Chrome prompts you.
+                      <strong>2.</strong> Return here and <strong>refresh the page</strong> (or tap <strong>Refresh and try again</strong> below) — tap <em>Allow</em> if Chrome prompts you. Your details will be kept.
                     </p>
                   </div>
                 </div>
@@ -423,9 +516,15 @@ export default function Landing() {
                   </p>
                 </div>
               )}
-              <Button fullWidth variant="secondary" onClick={reset}>
-                Try again
-              </Button>
+              {locationBlockedReason === 'denied' ? (
+                <Button fullWidth variant="secondary" onClick={reloadKeepingDetails}>
+                  Refresh and try again
+                </Button>
+              ) : (
+                <Button fullWidth variant="secondary" onClick={() => setStage('form')}>
+                  Try again
+                </Button>
+              )}
             </motion.div>
           )}
 
@@ -502,6 +601,14 @@ export default function Landing() {
                   {errorConfig.title}
                 </p>
                 <p className="text-sm text-ink-secondary mt-1.5 leading-relaxed">{errorConfig.body}</p>
+                {error === 'already_recorded' && sessionInfo?.courseCode && (
+                  <div className="mt-3 px-4 py-2.5 rounded-xl bg-bg-surface border border-bg-border">
+                    <p className="text-xs text-ink-muted">{sessionInfo.courseCode}</p>
+                    {sessionInfo.courseName && (
+                      <p className="text-sm font-semibold text-ink-primary mt-0.5">{sessionInfo.courseName}</p>
+                    )}
+                  </div>
+                )}
               </div>
               {!errorConfig.soft && (
                 <Button fullWidth variant="secondary" onClick={reset}>
@@ -509,10 +616,17 @@ export default function Landing() {
                 </Button>
               )}
               {errorConfig.soft && (
-                <Button fullWidth variant="ghost" size="sm" onClick={() => navigate(`/history?id=${studentId}`)}>
-                  <History size={14} />
-                  View my absence history
-                </Button>
+                <>
+                  {error === 'already_recorded' && (
+                    <Button fullWidth variant="secondary" onClick={reset}>
+                      Use a different course code
+                    </Button>
+                  )}
+                  <Button fullWidth variant="ghost" size="sm" onClick={() => navigate(`/history?id=${studentId}`)}>
+                    <History size={14} />
+                    View my absence history
+                  </Button>
+                </>
               )}
             </motion.div>
           )}
