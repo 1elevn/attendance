@@ -58,7 +58,7 @@ export default function AdminCourses() {
     setEditingId(course.id)
     setForm({
       facultyIds: course.facultyIds ?? [],
-      schedule: course.schedule === 'Not yet scheduled' ? '' : course.schedule,
+      schedule: course.schedule === 'Not yet scheduled' ? '' : (course.schedule ?? ''),
       room: course.room === 'TBD' ? '' : course.room,
     })
   }
@@ -101,8 +101,8 @@ export default function AdminCourses() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-4 sm:px-6 py-3">
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Courses</h1>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
@@ -116,7 +116,7 @@ export default function AdminCourses() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {isLoading && (
             <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
               <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />
@@ -143,7 +143,7 @@ export default function AdminCourses() {
                     course.needsSetup ? 'border-amber-300 dark:border-amber-500/40' : 'border-gray-200 dark:border-bg-border'
                   }`}
                 >
-                  <div className="px-5 py-4 flex items-start justify-between gap-4">
+                  <div className="px-4 sm:px-5 py-4 flex flex-wrap sm:flex-nowrap items-start justify-between gap-3 sm:gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold text-gray-800 dark:text-ink-primary">{course.code}</p>
