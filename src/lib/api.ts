@@ -96,10 +96,10 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
-export async function login(email: string, password: string) {
-  return apiFetch<{ token: string; user: { id: string; name: string; role: 'faculty' | 'admin' } }>(
+export async function login(email: string, password: string, role?: 'faculty' | 'admin') {
+  return apiFetch<{ token: string; user: { id: string; name: string; role: 'faculty' | 'admin'; roles: Array<'faculty' | 'admin'> } }>(
     '/auth/login',
-    { method: 'POST', body: JSON.stringify({ email, password }) },
+    { method: 'POST', body: JSON.stringify({ email, password, role }) },
   )
 }
 

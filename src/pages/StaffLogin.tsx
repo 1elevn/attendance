@@ -31,14 +31,16 @@ export default function StaffLogin() {
     if (!selectedRole) return
     setLoading(true)
     try {
-      const { token, user } = await login(identifier.trim(), password)
+      const { token, user } = await login(identifier.trim(), password, selectedRole === 'admin' ? 'admin' : 'faculty')
       setRole(user.role, user.id, user.name, token)
       const first = user.name.split(' ')[0]
       toast.success(`Welcome, ${first}`, { duration: 2000 })
       if (user.role === 'faculty') navigate('/faculty/dashboard')
       else navigate('/admin/dashboard')
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
+      if (err instanceof ApiError && err.status === 403 && err.body?.error === 'role_not_permitted') {
+        toast.error(`This account doesn't have ${selectedRole === 'admin' ? 'administrator' : 'faculty'} access.`)
+      } else if (err instanceof ApiError && err.status === 401) {
         toast.error('Invalid credentials.')
       } else {
         toast.error('Login failed — please try again.')

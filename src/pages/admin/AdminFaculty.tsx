@@ -123,7 +123,7 @@ export default function AdminFaculty() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Faculty</h1>
@@ -145,7 +145,7 @@ export default function AdminFaculty() {
             <button
               onClick={inviteAllPending}
               disabled={pendingCount === 0 || isBulkInviting}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
               {isBulkInviting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               Invite all pending
@@ -155,7 +155,7 @@ export default function AdminFaculty() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {isLoading && (
             <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
               <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />

@@ -161,18 +161,18 @@ export default function AdminCamu() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-4 sm:px-6 py-3">
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Camu Sync</h1>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Status, history, and errors for the Camu integration</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {isSyncing && (
               <button
                 onClick={handleStop}
                 disabled={isStopping || status?.cancelRequested}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-500/30 bg-white dark:bg-bg-surface text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+                className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-red-200 dark:border-red-500/30 bg-white dark:bg-bg-surface text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50 transition-colors"
               >
                 <Square className="w-3 h-3 fill-current" />
                 {status?.cancelRequested ? 'Stopping…' : 'Stop sync'}
@@ -181,7 +181,7 @@ export default function AdminCamu() {
             <button
               onClick={handleSync}
               disabled={isSyncing}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
+              className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               {isSyncing ? 'Syncing…' : 'Sync now'}
@@ -191,7 +191,7 @@ export default function AdminCamu() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
           {/* Last run card */}
           {isLoading ? (

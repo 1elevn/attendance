@@ -62,7 +62,7 @@ export default function AdminFacultyDetail() {
 
   return (
     <div className="min-h-0 flex flex-col">
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto">
           <Link
             to="/admin/faculty"
@@ -76,7 +76,7 @@ export default function AdminFacultyDetail() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
           {isLoading && (
             <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl p-5 space-y-3 animate-pulse">
               <div className="h-10 bg-gray-100 dark:bg-bg-elevated rounded" />

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff, RefreshCw, SlidersHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getWeeklyAbsences, getAdminCourses, fetchAllAdminStudents, ApiError } from '../../lib/api'
@@ -40,6 +40,8 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const [selectedWeek, setSelectedWeek] = useState<string>(currentWeekKey())
   const [courseFilter, setCourseFilter] = useState<string>('')
+  // Below sm the filters collapse behind a toggle so the toolbar doesn't eat the screen
+  const [showFilters, setShowFilters] = useState(false)
   const [studentSearch, setStudentSearch] = useState('')
   const [programFilter, setProgramFilter] = useState('')
   const [yearFilter, setYearFilter] = useState<string>('')
@@ -211,19 +213,19 @@ export default function AdminDashboard() {
     <div className="min-h-0 flex flex-col">
 
       {/* ── Sticky toolbar ─────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-6 py-3">
+      <div className="lg:sticky lg:top-0 z-20 bg-white/95 dark:bg-bg-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-bg-border px-4 sm:px-6 py-3">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-3">
 
           {/* Week nav */}
-          <div className="flex items-center gap-1 bg-gray-50 dark:bg-bg-elevated/40 border border-gray-200 dark:border-bg-border rounded-lg px-1 py-1">
+          <div className="flex items-center justify-between sm:justify-start gap-1 w-full sm:w-auto bg-gray-50 dark:bg-bg-elevated/40 border border-gray-200 dark:border-bg-border rounded-lg px-1 py-1">
             <button
               onClick={() => navigateWeek(-1)}
               disabled={!canGoPrev}
-              className="p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              className="w-11 h-11 sm:w-auto sm:h-auto flex items-center justify-center sm:p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="px-3 text-center min-w-[210px]">
+            <div className="px-3 text-center min-w-0 flex-1 sm:flex-none sm:min-w-[210px]">
               <span className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide block leading-none mb-0.5">
                 {relLabel}
               </span>
@@ -232,17 +234,28 @@ export default function AdminDashboard() {
             <button
               onClick={() => navigateWeek(1)}
               disabled={!canGoNext}
-              className="p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              className="w-11 h-11 sm:w-auto sm:h-auto flex items-center justify-center sm:p-1.5 rounded-md text-gray-500 dark:text-ink-muted hover:bg-white dark:hover:bg-bg-elevated hover:shadow-sm disabled:opacity-25 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Filters toggle (phones only) */}
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            aria-expanded={showFilters}
+            className="sm:hidden inline-flex items-center gap-1.5 text-xs font-semibold px-3 min-h-11 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            Filters
+          </button>
+
+          <div className={`${showFilters ? 'flex' : 'hidden'} sm:contents flex-col gap-3 w-full`}>
           {/* Course filter */}
           <select
             value={courseFilter}
             onChange={e => setCourseFilter(e.target.value)}
-            className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-auto border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All courses</option>
             {courses.map(c => (
@@ -253,13 +266,13 @@ export default function AdminDashboard() {
           </select>
 
           {/* Student search */}
-          <label className="relative">
+          <label className="relative w-full sm:w-auto">
             <Search className="w-4 h-4 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={studentSearch}
               onChange={e => setStudentSearch(e.target.value)}
               placeholder="Search student or program"
-              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
 
@@ -267,7 +280,7 @@ export default function AdminDashboard() {
             <select
               value={programFilter}
               onChange={e => setProgramFilter(e.target.value)}
-              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-auto border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All programs</option>
               {programs.map((program) => (
@@ -280,7 +293,7 @@ export default function AdminDashboard() {
             <select
               value={yearFilter}
               onChange={e => setYearFilter(e.target.value)}
-              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-auto border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-ink-secondary focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All years</option>
               {years.map((year) => (
@@ -289,10 +302,10 @@ export default function AdminDashboard() {
             </select>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => toggleStatusFilter('flagged')}
-              className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
+              className={`text-xs font-semibold px-3 sm:px-2.5 py-2 sm:py-1.5 rounded-full border transition-colors ${
                 statusFilters.flagged
                   ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30'
                   : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
@@ -302,7 +315,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => toggleStatusFilter('recurring')}
-              className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
+              className={`text-xs font-semibold px-3 sm:px-2.5 py-2 sm:py-1.5 rounded-full border transition-colors ${
                 statusFilters.recurring
                   ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/30'
                   : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
@@ -312,7 +325,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => toggleStatusFilter('unexcused')}
-              className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border transition-colors ${
+              className={`text-xs font-semibold px-3 sm:px-2.5 py-2 sm:py-1.5 rounded-full border transition-colors ${
                 statusFilters.unexcused
                   ? 'bg-gray-100 dark:bg-bg-elevated text-gray-700 dark:text-ink-secondary border-gray-300 dark:border-slate-600'
                   : 'bg-white dark:bg-bg-surface text-gray-500 dark:text-ink-muted border-gray-200 dark:border-bg-border hover:bg-gray-50 dark:hover:bg-bg-elevated/60'
@@ -322,11 +335,13 @@ export default function AdminDashboard() {
             </button>
           </div>
 
+          </div>
+
           {/* Camu sync */}
           <button
             onClick={handleCamuSync}
             disabled={isSyncing}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
+            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
             title="Pull students and enrollments from Camu"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -335,7 +350,7 @@ export default function AdminDashboard() {
 
           {/* Summary pills */}
           {!isLoading && filteredSummaries.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {flaggedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 px-2.5 py-1 rounded-full">
                   <Flag className="w-3 h-3 fill-red-500" />
@@ -360,7 +375,7 @@ export default function AdminDashboard() {
 
       {/* ── Content ────────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
           {/* Loading state */}
           {isLoading && (
@@ -444,11 +459,11 @@ export default function AdminDashboard() {
               ) : (
               <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl overflow-x-auto">
               {/* Legend */}
-              <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                 <h2 className="text-sm font-semibold text-gray-700 dark:text-ink-secondary">
                   Absences · {relLabel}
                 </h2>
-                <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-slate-500">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 dark:text-slate-500">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                     Unexcused miss
@@ -561,7 +576,7 @@ function AbsenceRow({
       <td className="px-3 py-3.5 text-center">
         <button
           onClick={() => onTogglePin(s.studentId)}
-          className={`inline-flex items-center justify-center w-7 h-7 rounded-md border transition-colors ${
+          className={`inline-flex items-center justify-center w-9 h-9 sm:w-7 sm:h-7 rounded-md border transition-colors ${
             isPinned
               ? 'border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
               : 'border-transparent text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-ink-secondary hover:bg-gray-100 dark:hover:bg-bg-elevated'

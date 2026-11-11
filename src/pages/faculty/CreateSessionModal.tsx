@@ -39,8 +39,9 @@ function todayISO(): string {
   return new Date().toISOString().split('T')[0]
 }
 
-function defaultStartTime(schedule: string): string {
-  const match = schedule.match(/(\d{2}:\d{2})/)
+// A course that isn't configured yet has no schedule (the API omits it).
+function defaultStartTime(schedule?: string): string {
+  const match = schedule?.match(/(\d{2}:\d{2})/)
   return match ? match[1] : '08:00'
 }
 

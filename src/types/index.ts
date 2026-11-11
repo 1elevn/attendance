@@ -14,7 +14,7 @@ export interface Course {
   name: string
   department: string
   credits: number
-  schedule: string
+  schedule?: string
   room: string
   facultyIds: string[]
   // Populated (id + name) by admin endpoints only; faculty's own "my courses" omits it.
