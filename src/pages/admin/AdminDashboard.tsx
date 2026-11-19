@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff, RefreshCw, SlidersHorizontal } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flag, AlertTriangle, Search, Pin, PinOff, RefreshCw, SlidersHorizontal, Download } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getWeeklyAbsences, getAdminCourses, fetchAllAdminStudents, ApiError } from '../../lib/api'
+import { getWeeklyAbsences, getAdminCourses, fetchAllAdminStudents, downloadWeeklyReport, ApiError } from '../../lib/api'
 import type { AdminStudent, CamuSyncResult } from '../../lib/api'
 import type { Course } from '../../types'
 import { useCamuSyncStatus } from '../../hooks/useCamuSyncStatus'
@@ -13,7 +13,8 @@ import {
   shiftWeek,
   getISOWeekStart,
   weekKey,
-  type WeeklyAbsenceSummary,
+  type AdminWeeklyAbsenceSummary,
+  type SessionDayStatus,
 } from '../../lib/attendanceUtils'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -34,6 +35,13 @@ function relativeWeekLabel(key: string): string {
   return 'Upcoming'
 }
 
+/** "2026-06-02" -> "Tue 2 Jun". Session dates are plain YYYY-MM-DD, so format in UTC. */
+function formatSessionDate(date: string): string {
+  return new Date(date + 'T00:00:00Z')
+    .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+    .replace(',', '')
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
@@ -52,8 +60,9 @@ export default function AdminDashboard() {
   })
   const [pinnedStudentIds, setPinnedStudentIds] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const [isExporting, setIsExporting] = useState(false)
 
-  const [summaries, setSummaries] = useState<WeeklyAbsenceSummary[]>([])
+  const [summaries, setSummaries] = useState<AdminWeeklyAbsenceSummary[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [students, setStudents] = useState<AdminStudent[]>([])
 
@@ -111,6 +120,17 @@ export default function AdminDashboard() {
       toast.success('Camu sync started')
     } catch {
       // startCamuSync() already toasted the specific error
+    }
+  }
+
+  async function handleExport() {
+    setIsExporting(true)
+    try {
+      await downloadWeeklyReport(selectedWeek, courseFilter || undefined)
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Could not export the report.')
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -339,9 +359,18 @@ export default function AdminDashboard() {
 
           {/* Camu sync */}
           <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
+            title="Download this week's absence report (.xlsx) for the selected course filter"
+          >
+            <Download className="w-3.5 h-3.5" />
+            {isExporting ? 'Exporting…' : 'Export week'}
+          </button>
+          <button
             onClick={handleCamuSync}
             disabled={isSyncing}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg border border-gray-200 dark:border-bg-border bg-white dark:bg-bg-surface text-gray-600 dark:text-ink-secondary hover:bg-gray-50 dark:hover:bg-bg-elevated/60 disabled:opacity-50 transition-colors"
             title="Pull students and enrollments from Camu"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -518,37 +547,40 @@ export default function AdminDashboard() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SessionDots({
-  scheduledSessions,
-  unexcusedCount,
-  excusedCount,
-}: {
-  scheduledSessions: number
-  unexcusedCount: number
-  excusedCount: number
-}) {
-  const attended = scheduledSessions - unexcusedCount - excusedCount
+const DOT_STYLE: Record<SessionDayStatus, { className: string; label: string }> = {
+  absent_unexcused: { className: 'bg-red-500 shadow-sm', label: 'unexcused absence' },
+  absent_excused: { className: 'bg-amber-400', label: 'excused absence' },
+  attended: { className: 'bg-emerald-400', label: 'attended' },
+}
+
+function SessionDots({ sessions }: { sessions: AdminWeeklyAbsenceSummary['sessions'] }) {
+  const missed = sessions.filter(d => d.status !== 'attended')
 
   return (
     <div className="flex flex-col gap-1">
+      {/* One dot per session, in date order; hover (or focus/tap) shows when it was */}
       <div className="flex items-center gap-1.5">
-        {Array.from({ length: unexcusedCount }).map((_, i) => (
-          <span
-            key={`u${i}`}
-            className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm"
-            title="Unexcused absence"
-          />
-        ))}
-        {Array.from({ length: Math.max(0, attended) }).map((_, i) => (
-          <span
-            key={`a${i}`}
-            className="w-2.5 h-2.5 rounded-full bg-emerald-400"
-            title="Attended"
-          />
-        ))}
+        {sessions.map((d, i) => {
+          const text = `${formatSessionDate(d.date)}, ${d.startTime} — ${DOT_STYLE[d.status].label}`
+          return (
+            <span
+              key={`${d.date}-${d.startTime}-${i}`}
+              tabIndex={0}
+              role="img"
+              aria-label={text}
+              title={text}
+              className={`w-2.5 h-2.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${DOT_STYLE[d.status].className}`}
+            />
+          )
+        })}
       </div>
-      {excusedCount > 0 && (
-        <span className="text-xs text-gray-400 dark:text-slate-500">+{excusedCount} excused</span>
+      {/* Touch screens have no hover, so spell out the missed dates below sm */}
+      {missed.length > 0 && (
+        <span className="sm:hidden text-xs text-gray-400 dark:text-slate-500">
+          {missed
+            .map(d => `${formatSessionDate(d.date)}${d.status === 'absent_excused' ? ' (excused)' : ''}`)
+            .join(', ')}
+        </span>
       )}
     </div>
   )
@@ -560,7 +592,7 @@ function AbsenceRow({
   isPinned,
   onTogglePin,
 }: {
-  summary: WeeklyAbsenceSummary
+  summary: AdminWeeklyAbsenceSummary
   student: AdminStudent | undefined
   isPinned: boolean
   onTogglePin: (studentId: string) => void
@@ -605,15 +637,21 @@ function AbsenceRow({
       <td className="px-5 py-3.5">
         <p className="font-medium text-gray-800 dark:text-ink-primary">{s.courseCode}</p>
         <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{s.courseName}</p>
+        <p
+          className="text-xs text-gray-500 dark:text-slate-400 mt-0.5"
+          title={s.facultyNames.length > 1 ? s.facultyNames.join(', ') : undefined}
+        >
+          {s.facultyNames.length === 0
+            ? 'Unassigned'
+            : s.facultyNames.length === 1
+            ? s.facultyNames[0]
+            : `${s.facultyNames[0]} +${s.facultyNames.length - 1}`}
+        </p>
       </td>
 
       {/* Session dots */}
       <td className="px-5 py-3.5">
-        <SessionDots
-          scheduledSessions={s.scheduledSessions}
-          unexcusedCount={s.unexcusedCount}
-          excusedCount={s.excusedCount}
-        />
+        <SessionDots sessions={s.sessions} />
       </td>
 
       {/* Status badges */}

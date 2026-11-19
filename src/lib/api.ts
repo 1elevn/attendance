@@ -1,6 +1,6 @@
 import { useAppStore } from '../store'
 import type { Session, AttendanceRecord, AttendanceStatus, AbsenceReason, Course } from '../types'
-import type { WeeklyAbsenceSummary } from './attendanceUtils'
+import type { AdminWeeklyAbsenceSummary } from './attendanceUtils'
 
 const BASE: string =
   import.meta.env.VITE_API_BASE_URL ??
@@ -56,7 +56,11 @@ async function tryRefresh(): Promise<string | null> {
   }
 }
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+/**
+ * Fetch with the bearer token, refreshing it once on a 401. Returns the raw
+ * Response so callers can read it as JSON, a blob, etc.
+ */
+async function authedFetch(path: string, init?: RequestInit): Promise<Response> {
   const token = useAppStore.getState().token
 
   const makeRequest = async (tok: string | null) => {
@@ -87,6 +91,12 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
       throw new ApiError(401, { error: 'Session expired' })
     }
   }
+
+  return res
+}
+
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await authedFetch(path, init)
 
   if (res.status === 204) return undefined as T
   const body = await res.json().catch(() => ({})) as Record<string, unknown>
@@ -341,7 +351,7 @@ export function openLiveStream(
 export async function getWeeklyAbsences(week: string, courseId?: string) {
   const params = new URLSearchParams({ week })
   if (courseId) params.set('courseId', courseId)
-  return apiFetch<WeeklyAbsenceSummary[]>(`/admin/weekly-absences?${params}`)
+  return apiFetch<AdminWeeklyAbsenceSummary[]>(`/admin/weekly-absences?${params}`)
 }
 
 export async function getAdminCourses() {
@@ -532,10 +542,29 @@ export async function fetchAllAdminStudents(): Promise<AdminStudent[]> {
   return all
 }
 
-export function getExportUrl(week: string, format: 'csv' | 'json', courseId?: string) {
-  const params = new URLSearchParams({ week, format })
+/**
+ * Downloads the weekly absence report (.xlsx, in the institution's template
+ * layout) for the week containing `week`, optionally limited to one course.
+ * Uses an authenticated fetch + blob rather than a plain link, since the API
+ * needs the bearer token and tokens don't belong in URLs.
+ */
+export async function downloadWeeklyReport(week: string, courseId?: string): Promise<void> {
+  const params = new URLSearchParams({ week, format: 'xlsx' })
   if (courseId) params.set('courseId', courseId)
-  const token = useAppStore.getState().token
-  if (token) params.set('token', token)
-  return `${BASE}/admin/reports/export?${params}`
+
+  const res = await authedFetch(`/admin/reports/export?${params}`)
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({})) as Record<string, unknown>
+    throw new ApiError(res.status, body)
+  }
+
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `weekly-attendance-report-${week}.xlsx`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }
