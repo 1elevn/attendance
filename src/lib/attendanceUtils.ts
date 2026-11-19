@@ -80,6 +80,17 @@ export interface WeeklyAbsenceSummary {
   isRecurring: boolean        // flagged in ≥ 2 of the 4 most recent weeks
 }
 
+export type SessionDayStatus = 'attended' | 'absent_excused' | 'absent_unexcused'
+
+/** What the admin API returns for each row: the summary plus per-session detail. */
+export interface AdminWeeklyAbsenceSummary extends WeeklyAbsenceSummary {
+  year: number | null
+  /** Every faculty member on the course (instructors and FIs are not distinguished). */
+  facultyNames: string[]
+  /** One entry per closed session that week, in date order, with this student's outcome. */
+  sessions: { date: string; startTime: string; status: SessionDayStatus }[]
+}
+
 /**
  * Computes per-student, per-course absence summaries for a given week.
  *
