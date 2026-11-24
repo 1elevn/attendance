@@ -20,6 +20,7 @@ import FacultyDashboard from './pages/faculty/FacultyDashboard'
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminCourses from './pages/admin/AdminCourses'
+import AdminCourseDetail from './pages/admin/AdminCourseDetail'
 import AdminStudents from './pages/admin/AdminStudents'
 import AdminFaculty from './pages/admin/AdminFaculty'
 import AdminFacultyDetail from './pages/admin/AdminFacultyDetail'
@@ -69,6 +70,7 @@ export default function App() {
         {/* Admin */}
         <Route path="/admin/dashboard" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
         <Route path="/admin/courses" element={<AdminProtected><AdminCourses /></AdminProtected>} />
+        <Route path="/admin/courses/:id" element={<AdminProtected><AdminCourseDetail /></AdminProtected>} />
         <Route path="/admin/students" element={<AdminProtected><AdminStudents /></AdminProtected>} />
         <Route path="/admin/faculty" element={<AdminProtected><AdminFaculty /></AdminProtected>} />
         <Route path="/admin/students/:id" element={<AdminProtected><AdminStudentDetail /></AdminProtected>} />

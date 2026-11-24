@@ -164,7 +164,7 @@ export default function AdminDashboard() {
     [students],
   )
   const years = useMemo(
-    () => Array.from(new Set(students.map(s => s.year).filter(Boolean))).sort((a, b) => a - b),
+    () => Array.from(new Set(students.map(s => s.year).filter((y): y is number => y != null))).sort((a, b) => a - b),
     [students],
   )
 

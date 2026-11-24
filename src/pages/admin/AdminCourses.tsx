@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2, Search } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   getAdminCourses,
@@ -21,12 +22,14 @@ function emptyForm(): SetupFormState {
 }
 
 export default function AdminCourses() {
+  const navigate = useNavigate()
   const [courses, setCourses] = useState<Course[]>([])
   const [faculty, setFaculty] = useState<AdminFaculty[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<SetupFormState>(emptyForm())
   const [isSaving, setIsSaving] = useState(false)
+  const [query, setQuery] = useState('')
 
   function load() {
     setIsLoading(true)
@@ -51,6 +54,19 @@ export default function AdminCourses() {
       return a.code.localeCompare(b.code)
     })
   }, [courses])
+
+  // Matches every whitespace-separated term against code, name, department, cohort and faculty.
+  const visibleCourses = useMemo(() => {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+    if (terms.length === 0) return sortedCourses
+    return sortedCourses.filter((c) => {
+      const haystack = [
+        c.code, c.name, c.department, c.cohort, c.cohortCode, c.room, c.facultyName,
+        ...(c.faculty ?? []).map((f) => f.name),
+      ].join(' ').toLowerCase()
+      return terms.every((t) => haystack.includes(t))
+    })
+  }, [sortedCourses, query])
 
   const needsSetupCount = courses.filter((c) => c.needsSetup).length
 
@@ -78,14 +94,16 @@ export default function AdminCourses() {
   }
 
   async function saveSetup(courseId: string) {
-    if (form.facultyIds.length === 0 || !form.schedule.trim() || !form.room.trim()) {
-      toast.error('At least one faculty member, plus schedule and room, are required')
+    // Camu courses' faculty are managed on the course page (the sync would revert a direct edit).
+    const isCamu = courses.find((c) => c.id === courseId)?.source === 'camu'
+    if ((!isCamu && form.facultyIds.length === 0) || !form.schedule.trim() || !form.room.trim()) {
+      toast.error(isCamu ? 'Schedule and room are required' : 'At least one faculty member, plus schedule and room, are required')
       return
     }
     setIsSaving(true)
     try {
       const updated = await updateAdminCourse(courseId, {
-        facultyIds: form.facultyIds,
+        ...(isCamu ? {} : { facultyIds: form.facultyIds }),
         schedule: form.schedule.trim(),
         room: form.room.trim(),
       })
@@ -106,12 +124,22 @@ export default function AdminCourses() {
           <div>
             <h1 className="text-sm font-semibold text-gray-800 dark:text-ink-primary">Courses</h1>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
-              {courses.length} course{courses.length !== 1 ? 's' : ''}
+              {query.trim() ? `${visibleCourses.length} of ${courses.length}` : courses.length} course{(query.trim() ? visibleCourses.length : courses.length) !== 1 ? 's' : ''}
               {needsSetupCount > 0 && (
                 <span className="text-amber-600 dark:text-amber-400 font-medium"> · {needsSetupCount} need setup</span>
               )}
             </p>
           </div>
+          <label className="relative w-full sm:w-auto">
+            <Search className="w-4 h-4 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search code, name, department, or faculty"
+              aria-label="Search courses"
+              className="border border-gray-200 dark:border-bg-border bg-gray-50 dark:bg-bg-elevated/40 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-ink-secondary w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </label>
         </div>
       </div>
 
@@ -134,12 +162,20 @@ export default function AdminCourses() {
             </div>
           )}
 
-          {!isLoading && sortedCourses.length > 0 && (
+          {!isLoading && sortedCourses.length > 0 && visibleCourses.length === 0 && (
+            <div className="bg-white dark:bg-bg-surface border border-gray-200 dark:border-bg-border rounded-xl flex flex-col items-center justify-center py-16 text-center">
+              <p className="font-medium text-gray-700 dark:text-ink-secondary">No matching courses</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">Nothing matches “{query.trim()}”.</p>
+            </div>
+          )}
+
+          {!isLoading && visibleCourses.length > 0 && (
             <div className="space-y-3">
-              {sortedCourses.map((course) => (
+              {visibleCourses.map((course) => (
                 <div
                   key={course.id}
-                  className={`bg-white dark:bg-bg-surface border rounded-xl overflow-hidden ${
+                  onClick={() => navigate(`/admin/courses/${course.id}`)}
+                  className={`bg-white dark:bg-bg-surface border rounded-xl overflow-hidden cursor-pointer hover:shadow-sm transition-shadow ${
                     course.needsSetup ? 'border-amber-300 dark:border-amber-500/40' : 'border-gray-200 dark:border-bg-border'
                   }`}
                 >
@@ -176,9 +212,10 @@ export default function AdminCourses() {
                       </p>
                     </div>
 
+                    <ChevronRight className="hidden sm:block w-4 h-4 text-gray-300 dark:text-slate-600 flex-shrink-0 mt-1 order-last" />
                     {course.needsSetup && editingId !== course.id && (
                       <button
-                        onClick={() => startEditing(course)}
+                        onClick={(e) => { e.stopPropagation(); startEditing(course) }}
                         className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors"
                       >
                         Set up
@@ -187,8 +224,23 @@ export default function AdminCourses() {
                   </div>
 
                   {editingId === course.id && (
-                    <div className="px-5 pb-4 pt-1 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-bg-elevated/30">
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-5 pb-4 pt-1 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-bg-elevated/30 cursor-default"
+                    >
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                        {course.source === 'camu' ? (
+                          <div className="block">
+                            <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">Faculty</span>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-ink-muted">
+                              Camu course — link faculty on the{' '}
+                              <Link to={`/admin/courses/${course.id}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+                                course page
+                              </Link>
+                              .
+                            </p>
+                          </div>
+                        ) : (
                         <div className="block">
                           <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">
                             Faculty (lecturer + any FIs — all can take attendance)
@@ -207,6 +259,7 @@ export default function AdminCourses() {
                             ))}
                           </div>
                         </div>
+                        )}
                         <label className="block">
                           <span className="text-xs font-medium text-gray-500 dark:text-ink-muted">Schedule</span>
                           <input
