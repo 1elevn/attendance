@@ -92,6 +92,7 @@ export default function AdminStudents() {
                       <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Name</th>
                       <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Email</th>
                       <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Program</th>
+                      <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Year</th>
                       <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Courses</th>
                       <th className="px-5 py-2.5 font-medium text-gray-500 dark:text-ink-muted">Source</th>
                     </tr>
@@ -115,6 +116,7 @@ export default function AdminStudents() {
                         </td>
                         <td className="px-5 py-3 text-gray-500 dark:text-ink-muted">{s.email}</td>
                         <td className="px-5 py-3 text-gray-500 dark:text-ink-muted">{s.program || '—'}</td>
+                        <td className="px-5 py-3 text-gray-500 dark:text-ink-muted">{s.year ?? '—'}</td>
                         <td className="px-5 py-3">
                           {s.courseCount === 0 ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 px-1.5 py-0.5 rounded-full">

@@ -379,6 +379,36 @@ export async function updateAdminCourse(
   })
 }
 
+export interface AdminCourseDetail extends Course {
+  manualFacultyIds: string[]
+  camu: {
+    subjectCode: string | null
+    sectionName: string | null
+    staffCodes: string[]
+    staffEmails: string[]
+    lastSyncedAt: string | null
+  }
+  facultyLinks: { id: string; name: string; email: string; activated: boolean; viaCamu: boolean; manual: boolean }[]
+  students: { id: string; studentId: string; name: string; email: string; program: string; year: number | null }[]
+  sessionCount: number
+  lastSessionDate: string | null
+}
+
+export async function getAdminCourse(courseId: string) {
+  return apiFetch<AdminCourseDetail>(`/admin/courses/${courseId}`)
+}
+
+export async function addCourseFaculty(courseId: string, userId: string) {
+  return apiFetch<Course>(`/admin/courses/${courseId}/faculty`, {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+  })
+}
+
+export async function removeCourseFaculty(courseId: string, userId: string) {
+  return apiFetch<Course>(`/admin/courses/${courseId}/faculty/${userId}`, { method: 'DELETE' })
+}
+
 export interface AdminFaculty {
   id: string
   name: string
@@ -467,7 +497,8 @@ export interface AdminStudent {
   name: string
   email: string
   program: string
-  year: number
+  /** Year group (graduating class), from the stored value or the student ID's last four digits. */
+  year: number | null
   cohortCode?: string
   courseIds: string[]
   courseCount: number
