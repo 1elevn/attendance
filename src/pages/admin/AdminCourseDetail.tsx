@@ -149,11 +149,9 @@ export default function AdminCourseDetail() {
                 {course.facultyLinks.length === 0 ? (
                   <div className={`${card} px-5 py-6 text-sm text-gray-500 dark:text-ink-muted`}>
                     <p className="font-medium text-gray-700 dark:text-ink-secondary">No faculty linked</p>
-                    <p className="mt-1">
-                      Camu lists the instructor as “{course.facultyName || 'Unassigned'}”
-                      {course.camu.staffEmails.length > 0 && <> ({course.camu.staffEmails.join(', ')})</>} but no
-                      account matched.{isCamu && ' Use “Add faculty” to link someone manually; it persists across syncs.'}
-                    </p>
+                    {isCamu && (
+                      <p className="mt-1">Use “Add faculty” to link someone manually; it persists across syncs.</p>
+                    )}
                   </div>
                 ) : (
                   <ul className={`${card} divide-y divide-gray-100 dark:divide-slate-800`}>
